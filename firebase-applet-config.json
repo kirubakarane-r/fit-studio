@@ -1,10 +1,10 @@
 {
-  "projectId": "deep-bedrock-ffs6l",
-  "appId": "1:35423318021:web:7452508aab76bb46a7ec6c",
-  "apiKey": "AIzaSyBBQRA-4y3rUljZdgdqjNxfZ7-PNR9JYYQ",
-  "authDomain": "deep-bedrock-ffs6l.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-gymlog-a188dcfe-1952-46cd-9404-b10cf753563e",
-  "storageBucket": "deep-bedrock-ffs6l.firebasestorage.app",
-  "messagingSenderId": "35423318021",
-  "measurementId": ""
+  "projectId": "fit-studio-478e4",
+  "appId": "1:513056321853:web:ca948191d1b59a11c15554",
+  "apiKey": "AIzaSyC4C9fPxxuAkwzlmzu79_VdOfnvdPdF-WA",
+  "authDomain": "fit-studio-478e4.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "fit-studio-478e4.firebasestorage.app",
+  "messagingSenderId": "513056321853",
+  "measurementId": "G-Q1B43W441D"
 }
