@@ -38,7 +38,7 @@ export default function AddExerciseModal() {
   const exerciseListContent = filtered.length === 0
     ? createElement(
         'div',
-        { className: 'text-center py-6 text-xs text-neutral-500' },
+        { className: 'text-center py-6 text-sm text-neutral-500' },
         'No matching exercises found.'
       )
     : filtered.map(ex =>
@@ -52,10 +52,10 @@ export default function AddExerciseModal() {
           createElement(
             'div',
             null,
-            createElement('h4', { className: 'text-xs font-bold text-neutral-200' }, ex.name),
+            createElement('h4', { className: 'text-sm font-bold text-neutral-200' }, ex.name),
             createElement(
               'span',
-              { className: 'text-[9px] text-neutral-500 font-mono mt-0.5 inline-block' },
+              { className: 'text-[10px] text-neutral-500 font-mono mt-0.5 inline-block' },
               ex.type === 'weight' ? 'Weighted' : ex.type === 'bodyweight' ? 'Bodyweight' : 'Cardio'
             )
           ),
@@ -85,7 +85,7 @@ export default function AddExerciseModal() {
           'div',
           null,
           createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, 'Add Exercise Movement'),
-          createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Select an active exercise block from the library list.')
+          createElement('p', { className: 'text-sm text-neutral-500 mt-1' }, 'Select an active exercise block from the library list.')
         ),
         createElement(
           'button',
@@ -112,7 +112,7 @@ export default function AddExerciseModal() {
             placeholder: 'Search exercise catalog...',
             value: exerciseSearch,
             onChange: (e: ChangeEvent<HTMLInputElement>) => setExerciseSearch(e.target.value),
-            className: 'w-full bg-transparent border-none text-xs text-neutral-200 focus:outline-none'
+            className: 'w-full bg-transparent border-none text-sm text-neutral-200 focus:outline-none'
           })
         ),
 
@@ -124,7 +124,7 @@ export default function AddExerciseModal() {
             'button',
             {
               onClick: () => setMuscleFilter(''),
-              className: `px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
+              className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                 muscleFilter === ''
                   ? 'bg-emerald-500 text-black border-emerald-500'
                   : 'bg-neutral-900 text-neutral-400 border-neutral-800'
@@ -138,7 +138,7 @@ export default function AddExerciseModal() {
               {
                 key: m,
                 onClick: () => setMuscleFilter(m === muscleFilter ? '' : m),
-                className: `px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
+                className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                   muscleFilter === m
                     ? 'bg-emerald-500 text-black border-emerald-500'
                     : 'bg-neutral-900 text-neutral-400 border-neutral-800'
@@ -165,7 +165,7 @@ export default function AddExerciseModal() {
           'button',
           {
             onClick: handleCreateNewExercise,
-            className: 'w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer'
+            className: 'w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer'
           },
           createElement(Plus, { className: 'w-4 h-4 text-emerald-400' }),
           createElement('span', null, 'Create New Movement Type')

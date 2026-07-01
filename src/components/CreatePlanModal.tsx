@@ -70,8 +70,8 @@ export default function CreatePlanModal() {
         createElement(
           'div',
           null,
-          createElement('h3', { className: 'text-sm font-extrabold text-neutral-100' }, 'Create New Workout Plan'),
-          createElement('p', { className: 'text-[10px] text-neutral-500 mt-0.5' }, 'Design a workout blueprint to launch instantly anytime.')
+          createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, 'Create New Workout Plan'),
+          createElement('p', { className: 'text-xs text-neutral-500 mt-0.5' }, 'Design a workout blueprint to launch instantly anytime.')
         ),
         createElement(
           'button',
@@ -86,14 +86,14 @@ export default function CreatePlanModal() {
       // Plan Name Input Field
       createElement(
         'div',
-        { className: 'p-4 border-b border-neutral-900 bg-[#0c0c0d] space-y-1.5' },
-        createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block' }, 'Plan Name'),
+        { className: 'p-4 border-b border-neutral-900 bg-[#0c0c0d] space-y-2' },
+        createElement('label', { className: 'text-xs font-bold text-neutral-400 uppercase tracking-wider block' }, 'Plan Name'),
         createElement('input', {
           type: 'text',
           placeholder: 'e.g., Upper Body Blaster, Heavy Legs...',
           value: planName,
           onChange: (e: ChangeEvent<HTMLInputElement>) => setPlanName(e.target.value),
-          className: 'w-full bg-neutral-900 border border-neutral-800 focus:border-emerald-500 text-xs rounded-xl px-3 py-2.5 text-neutral-100 focus:outline-none placeholder-neutral-600'
+          className: 'w-full bg-neutral-900 border border-neutral-800 focus:border-emerald-500 text-sm rounded-xl px-3 py-3 text-neutral-100 focus:outline-none placeholder-neutral-600'
         })
       ),
 
@@ -103,21 +103,21 @@ export default function CreatePlanModal() {
         { className: 'p-4 space-y-3 bg-[#0e0e10]/80 border-b border-neutral-900' },
         createElement(
           'span',
-          { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block' },
+          { className: 'text-xs font-bold text-neutral-400 uppercase tracking-wider block' },
           `Select Movements (${selectedIds.length} added)`
         ),
         
         // Search
         createElement(
           'div',
-          { className: 'flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-2 rounded-xl focus-within:border-emerald-500' },
-          createElement(Search, { className: 'w-3.5 h-3.5 text-neutral-500' }),
+          { className: 'flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-2.5 rounded-xl focus-within:border-emerald-500' },
+          createElement(Search, { className: 'w-4 h-4 text-neutral-500' }),
           createElement('input', {
             type: 'text',
             placeholder: 'Search library movements...',
             value: search,
             onChange: (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
-            className: 'w-full bg-transparent border-none text-xs text-neutral-200 focus:outline-none placeholder-neutral-600'
+            className: 'w-full bg-transparent border-none text-sm text-neutral-200 focus:outline-none placeholder-neutral-600'
           })
         ),
 
@@ -147,7 +147,7 @@ export default function CreatePlanModal() {
               'button',
               {
                 onClick: () => setMuscleFilter(''),
-                className: `px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer shrink-0 ${
                   muscleFilter === ''
                     ? 'bg-emerald-500 text-black border-emerald-500'
                     : 'bg-neutral-900 text-neutral-400 border-neutral-800'
@@ -220,17 +220,17 @@ export default function CreatePlanModal() {
                   createElement(
                     'div',
                     null,
-                    createElement('h4', { className: 'text-xs font-bold text-neutral-200' }, ex.name),
+                    createElement('h4', { className: 'text-sm font-bold text-neutral-200' }, ex.name),
                     createElement(
                       'span',
-                      { className: 'text-[9px] text-neutral-500 font-mono mt-0.5 inline-block' },
+                      { className: 'text-[10px] text-neutral-500 font-mono mt-0.5 inline-block' },
                       ex.type === 'weight' ? 'Weighted' : ex.type === 'bodyweight' ? 'Bodyweight' : 'Cardio'
                     )
                   )
                 ),
                 createElement(
                   'span',
-                  { className: `text-[9px] font-mono px-1.5 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+                  { className: `text-[10px] font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
                   capitalize(ex.muscle)
                 )
               );
@@ -246,16 +246,16 @@ export default function CreatePlanModal() {
           {
             onClick: handleSave,
             disabled: !planName.trim() || selectedIds.length === 0,
-            className: 'flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all'
+            className: 'flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all'
           },
-          createElement(X, { className: 'w-4 h-4' }),
+          createElement(Check, { className: 'w-4 h-4' }),
           createElement('span', null, 'Save Workout Plan')
         ),
         createElement(
           'button',
           {
             onClick: () => setShowCreatePlanModal(false),
-            className: 'px-4 py-2.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-xs font-semibold rounded-xl cursor-pointer'
+            className: 'px-5 py-3 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-sm font-semibold rounded-xl cursor-pointer'
           },
           'Cancel'
         )
