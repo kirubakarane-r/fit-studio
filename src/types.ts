@@ -29,3 +29,34 @@ export interface Workout {
   duration?: number; // seconds
   exercises: WorkoutExercise[];
 }
+
+export interface FoodItem {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servingSize?: string;
+}
+
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
+
+export interface FoodLogEntry {
+  id: string;
+  foodId: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  mealType: MealType;
+  servings: number;
+  timestamp: number;
+}
+
+export interface DailyNutrition {
+  id: string; // Format: YYYY-MM-DD
+  date: string; // Format: YYYY-MM-DD
+  logs: FoodLogEntry[];
+}
