@@ -124,24 +124,14 @@ export default function CreatePlanModal() {
         // Muscle Selector Chips Carousel
         createElement(
           'div',
-          { className: 'relative flex items-center px-7' },
-          
-          // Left Arrow Button
-          createElement(
-            'button',
-            {
-              onClick: () => scrollChips('left'),
-              className: 'absolute left-0 z-10 p-1.5 rounded-lg bg-neutral-900/90 text-neutral-400 hover:text-emerald-400 cursor-pointer shadow-md hover:bg-neutral-800 active:scale-95 transition-all flex items-center justify-center'
-            },
-            createElement(ChevronLeft, { className: 'w-3.5 h-3.5' })
-          ),
+          { className: 'relative flex items-center px-0' },
 
           // Chips Container
           createElement(
             'div',
             {
               ref: chipsRef,
-              className: 'flex gap-1.5 overflow-x-auto py-0.5 no-scrollbar scroll-smooth w-full'
+              className: 'flex gap-2 overflow-x-auto py-1 no-scrollbar w-full'
             },
             createElement(
               'button',
@@ -161,7 +151,7 @@ export default function CreatePlanModal() {
                 {
                   key: m,
                   onClick: () => setMuscleFilter(m === muscleFilter ? '' : m),
-                  className: `px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                  className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer shrink-0 ${
                     muscleFilter === m
                       ? 'bg-emerald-500 text-black border-emerald-500'
                       : 'bg-neutral-900 text-neutral-400 border-neutral-800'
@@ -170,16 +160,6 @@ export default function CreatePlanModal() {
                 capitalize(m)
               )
             )
-          ),
-
-          // Right Arrow Button
-          createElement(
-            'button',
-            {
-              onClick: () => scrollChips('right'),
-              className: 'absolute right-0 z-10 p-1.5 rounded-lg bg-neutral-900/90 text-neutral-400 hover:text-emerald-400 cursor-pointer shadow-md hover:bg-neutral-800 active:scale-95 transition-all flex items-center justify-center'
-            },
-            createElement(ChevronRight, { className: 'w-3.5 h-3.5' })
           )
         )
       ),
@@ -191,7 +171,7 @@ export default function CreatePlanModal() {
         filtered.length === 0
           ? createElement(
               'div',
-              { className: 'text-center py-6 text-xs text-neutral-500' },
+              { className: 'text-center py-6 text-sm text-neutral-500' },
               'No exercises found matching current search.'
             )
           : filtered.map(ex => {
@@ -223,14 +203,14 @@ export default function CreatePlanModal() {
                     createElement('h4', { className: 'text-sm font-bold text-neutral-200' }, ex.name),
                     createElement(
                       'span',
-                      { className: 'text-[10px] text-neutral-500 font-mono mt-0.5 inline-block' },
+                      { className: 'text-xs text-neutral-500 font-mono mt-0.5 inline-block' },
                       ex.type === 'weight' ? 'Weighted' : ex.type === 'bodyweight' ? 'Bodyweight' : 'Cardio'
                     )
                   )
                 ),
                 createElement(
                   'span',
-                  { className: `text-[10px] font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+                  { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
                   capitalize(ex.muscle)
                 )
               );

@@ -55,13 +55,13 @@ export default function AddExerciseModal() {
             createElement('h4', { className: 'text-sm font-bold text-neutral-200' }, ex.name),
             createElement(
               'span',
-              { className: 'text-[10px] text-neutral-500 font-mono mt-0.5 inline-block' },
+              { className: 'text-xs text-neutral-500 font-mono mt-0.5 inline-block' },
               ex.type === 'weight' ? 'Weighted' : ex.type === 'bodyweight' ? 'Bodyweight' : 'Cardio'
             )
           ),
           createElement(
             'span',
-            { className: `text-[10px] font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+            { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
             capitalize(ex.muscle)
           )
         )
