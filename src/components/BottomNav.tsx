@@ -51,18 +51,6 @@ export default function BottomNav() {
         createElement('span', null, 'Progress')
       ),
 
-      // Exercises button
-      createElement(
-        'button',
-        {
-          onClick: () => navigateTo('exercises'),
-          className: `flex-1 flex flex-col items-center justify-center gap-1 h-full text-[10px] font-bold tracking-tight cursor-pointer ${
-            screen === 'exercises' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-300'
-          }`
-        },
-        createElement(BookOpen, { className: 'w-5 h-5' }),
-        createElement('span', null, 'Exercises')
-      ),
 
       // Nutrition button
       createElement(
