@@ -1,7 +1,8 @@
-import { createElement } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { createElement, useState, ChangeEvent, useRef } from 'react';
+import { Plus, Trash2, Search } from 'lucide-react';
 import { useWorkout } from '../context/WorkoutContext';
 import { COMPREHENSIVE_EXERCISES } from '../data/dbExercises';
+import { capitalize } from '../utils/formatters';
 
 export default function ExercisesScreen() {
   const {
@@ -10,9 +11,19 @@ export default function ExercisesScreen() {
     handleDeleteExerciseFromLibrary,
   } = useWorkout();
 
+  const [search, setSearch] = useState('');
+  const [muscleFilter, setMuscleFilter] = useState('');
+  const chipsRef = useRef<HTMLDivElement>(null);
+
   // List of exercises grouped by muscle
   const groupsList = ['chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio'].map(muscle => {
-    const groupExercises = exercises.filter(e => e.muscle === muscle);
+    if (muscleFilter && muscleFilter !== muscle) return null;
+
+    const groupExercises = exercises.filter(e => {
+      const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase());
+      return e.muscle === muscle && matchesSearch;
+    });
+    
     if (groupExercises.length === 0) return null;
 
     return createElement(
@@ -75,11 +86,76 @@ export default function ExercisesScreen() {
       )
     ),
 
+    // Search and Filter Block
+    createElement(
+      'div',
+      { className: 'space-y-3' },
+      // Search
+      createElement(
+        'div',
+        { className: 'flex items-center gap-2 bg-[#121212] border border-neutral-800 px-3 py-2.5 rounded-xl focus-within:border-emerald-500' },
+        createElement(Search, { className: 'w-4 h-4 text-neutral-500' }),
+        createElement('input', {
+          type: 'text',
+          placeholder: 'Search library movements...',
+          value: search,
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
+          className: 'w-full bg-transparent border-none text-sm text-neutral-200 focus:outline-none placeholder-neutral-600'
+        })
+      ),
+
+      // Muscle Selector Chips
+      createElement(
+        'div',
+        { className: 'relative flex items-center px-0' },
+        createElement(
+          'div',
+          {
+            ref: chipsRef,
+            className: 'flex gap-2 overflow-x-auto py-1 no-scrollbar w-full'
+          },
+          createElement(
+            'button',
+            {
+              onClick: () => setMuscleFilter(''),
+              className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer shrink-0 ${
+                muscleFilter === ''
+                  ? 'bg-emerald-500 text-black border-emerald-500'
+                  : 'bg-neutral-900 text-neutral-400 border-neutral-800'
+              }`
+            },
+            'All'
+          ),
+          ['chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio'].map(m =>
+            createElement(
+              'button',
+              {
+                key: m,
+                onClick: () => setMuscleFilter(m === muscleFilter ? '' : m),
+                className: `px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer shrink-0 ${
+                  muscleFilter === m
+                    ? 'bg-emerald-500 text-black border-emerald-500'
+                    : 'bg-neutral-900 text-neutral-400 border-neutral-800'
+                }`
+              },
+              capitalize(m)
+            )
+          )
+        )
+      )
+    ),
+
     // List by muscle groups
     createElement(
       'div',
-      { className: 'space-y-6' },
-      groupsList
+      { className: 'space-y-6 pb-6' },
+      groupsList.some(g => g !== null) 
+        ? groupsList 
+        : createElement(
+            'div',
+            { className: 'text-center py-8 text-neutral-500 text-sm' },
+            'No matching exercises found.'
+          )
     )
   );
 }
