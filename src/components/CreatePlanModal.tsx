@@ -1,5 +1,5 @@
 import { createElement, useState, ChangeEvent, useRef } from 'react';
-import { X, Search, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Search, Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { capitalize, getMuscleColor } from '../utils/formatters';
 import { useWorkout } from '../context/WorkoutContext';
 
@@ -9,6 +9,7 @@ export default function CreatePlanModal() {
     setShowCreatePlanModal,
     exercises,
     handleCreatePlan,
+    setShowCreateLibraryModal,
   } = useWorkout();
 
   if (!showCreatePlanModal) return null;
@@ -215,6 +216,21 @@ export default function CreatePlanModal() {
                 )
               );
             })
+      ),
+
+      // Create Custom Exercise Action
+      createElement(
+        'div',
+        { className: 'p-4 border-t border-neutral-900 bg-neutral-950/20 flex flex-col' },
+        createElement(
+          'button',
+          {
+            onClick: () => setShowCreateLibraryModal(true),
+            className: 'w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer'
+          },
+          createElement(Plus, { className: 'w-4 h-4 text-emerald-400' }),
+          createElement('span', null, 'Create New Movement Type')
+        )
       ),
 
       // Footer

@@ -19,7 +19,7 @@ export default function CreateExerciseModal() {
 
   return createElement(
     'div',
-    { className: 'fixed inset-0 bg-black/60 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4' },
+    { className: 'fixed inset-0 bg-black/60 z-[60] flex items-end justify-center sm:items-center p-0 sm:p-4' },
     createElement(
       'div',
       { className: 'bg-[#121212] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-sm overflow-y-auto flex flex-col shadow-2xl' },
