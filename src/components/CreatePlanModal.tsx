@@ -58,7 +58,7 @@ export default function CreatePlanModal() {
     { className: 'fixed inset-0 bg-black/70 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4' },
     createElement(
       'div',
-      { className: 'bg-[#121212] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl overflow-hidden' },
+      { className: 'bg-[#161618] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[95vh] flex flex-col shadow-2xl overflow-hidden' },
       
       // Handle bar on mobile
       createElement('div', { className: 'w-12 h-1 bg-neutral-800 rounded-full mx-auto mt-3 mb-1 sm:hidden' }),
@@ -66,7 +66,7 @@ export default function CreatePlanModal() {
       // Header
       createElement(
         'div',
-        { className: 'p-4 border-b border-neutral-900 flex justify-between items-center bg-[#161618]' },
+        { className: 'p-4 border-b border-neutral-900 flex justify-between items-center' },
         createElement(
           'div',
           null,

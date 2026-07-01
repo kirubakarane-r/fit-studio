@@ -72,7 +72,7 @@ export default function AddExerciseModal() {
     { className: 'fixed inset-0 bg-black/60 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4' },
     createElement(
       'div',
-      { className: 'bg-[#121212] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl' },
+      { className: 'bg-[#161618] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[95vh] flex flex-col shadow-2xl overflow-hidden' },
       
       // Handle bar on mobile
       createElement('div', { className: 'w-12 h-1 bg-neutral-800 rounded-full mx-auto mt-3 mb-2 sm:hidden' }),
@@ -153,7 +153,7 @@ export default function AddExerciseModal() {
       // Scrollable exercise library list
       createElement(
         'div',
-        { className: 'flex-1 overflow-y-auto p-4 space-y-2 max-h-[40vh]' },
+        { className: 'flex-1 overflow-y-auto p-4 space-y-2' },
         exerciseListContent
       ),
 
