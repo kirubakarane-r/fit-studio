@@ -24,6 +24,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   const [height, setHeight] = useState('');
   const [gender, setGender] = useState('');
   const [goal, setGoal] = useState('');
+  const [age, setAge] = useState('');
+  const [medicalIssue, setMedicalIssue] = useState('');
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +40,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
     setHeight(profile.height || '');
     setGender(profile.gender || '');
     setGoal(profile.goal || '');
+    setAge(profile.age || '');
+    setMedicalIssue(profile.medicalIssue || '');
   }, [isOpen, profile]);
 
   if (!isOpen || !user) return null;
@@ -121,7 +125,9 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
         weight: weight.trim(),
         height: height.trim(),
         gender,
-        goal
+        goal,
+        age: age.trim(),
+        medicalIssue: medicalIssue.trim()
       });
 
       setSuccess(true);
@@ -255,8 +261,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                 />
               </div>
 
-              {/* Physical details grid (Weight & Height) */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Physical details grid (Weight, Height, Age) */}
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
                     <Scale className="w-3.5 h-3.5 text-neutral-500" />
@@ -268,7 +274,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="e.g. 74.5"
-                    className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-mono"
+                    className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-mono px-2"
                   />
                 </div>
 
@@ -283,7 +289,22 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
                     placeholder="e.g. 178"
-                    className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-mono"
+                    className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-mono px-2"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-3.5 h-3.5 text-neutral-500 flex items-center justify-center font-bold text-[10px]">#</span>
+                    <span>Age</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder="e.g. 25"
+                    className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-mono px-2"
                   />
                 </div>
               </div>
@@ -309,6 +330,20 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Medical Issue */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                  Medical Issues / Injuries
+                </label>
+                <textarea
+                  value={medicalIssue}
+                  onChange={(e) => setMedicalIssue(e.target.value)}
+                  placeholder="e.g. Lower back pain, shoulder impingement..."
+                  rows={2}
+                  className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-semibold transition-colors resize-none"
+                />
               </div>
 
               {/* Goal dropdown / select list */}

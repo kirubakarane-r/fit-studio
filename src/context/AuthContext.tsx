@@ -18,6 +18,8 @@ export interface ProfileData {
   height?: string;
   gender?: string;
   goal?: string;
+  age?: string;
+  medicalIssue?: string;
 }
 
 export interface AuthContextType {
@@ -34,6 +36,8 @@ export interface AuthContextType {
     height?: string;
     gender?: string;
     goal?: string;
+    age?: string;
+    medicalIssue?: string;
   }) => Promise<void>;
 }
 
@@ -62,7 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             weight: existingData.weight || '',
             height: existingData.height || '',
             gender: existingData.gender || '',
-            goal: existingData.goal || ''
+            goal: existingData.goal || '',
+            age: existingData.age || '',
+            medicalIssue: existingData.medicalIssue || ''
           };
 
           // Keep in sync
@@ -75,6 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             height: profileData.height || null,
             gender: profileData.gender || null,
             goal: profileData.goal || null,
+            age: profileData.age || null,
+            medicalIssue: profileData.medicalIssue || null,
             lastActive: new Date().toISOString()
           }, { merge: true });
 
@@ -87,7 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             weight: '',
             height: '',
             gender: '',
-            goal: ''
+            goal: '',
+            age: '',
+            medicalIssue: ''
           });
         }
       } else {
@@ -150,6 +160,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     height?: string;
     gender?: string;
     goal?: string;
+    age?: string;
+    medicalIssue?: string;
   }) => {
     if (!auth.currentUser) throw new Error('No user is currently signed in.');
     try {
@@ -171,6 +183,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         height: data.height || null,
         gender: data.gender || null,
         goal: data.goal || null,
+        age: data.age || null,
+        medicalIssue: data.medicalIssue || null,
         lastActive: new Date().toISOString()
       }, { merge: true });
 
@@ -181,7 +195,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         weight: data.weight || '',
         height: data.height || '',
         gender: data.gender || '',
-        goal: data.goal || ''
+        goal: data.goal || '',
+        age: data.age || '',
+        medicalIssue: data.medicalIssue || ''
       });
 
       // Reload to ensure firebase user state is synced
