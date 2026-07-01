@@ -10,6 +10,13 @@ body {
   background-color: #09090b;
 }
 
+/* Slightly increase base size on mobile to improve readability without breaking UI proportions */
+@media (max-width: 768px) {
+  html {
+    font-size: 17.5px;
+  }
+}
+
 /* Hide all scrollbars globally but keep full scrolling functionality */
 ::-webkit-scrollbar {
   display: none !important;
