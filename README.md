@@ -1,4 +1,4 @@
-# Gym Log - Personalized Workout Tracker
+# Fit Studio - Personalized Workout Tracker
 
 A modern, highly polished, and responsive full-stack fitness application built with **React**, **Vite**, **Tailwind CSS**, and **Firebase (Firestore & Authentication)**. This application serves as a dedicated platform for users to design workout splits, log active sessions, track progress metrics, and view detailed historic workout analytics.
 
