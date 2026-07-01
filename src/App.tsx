@@ -22,6 +22,7 @@ import ConfirmDialogs from './components/ConfirmDialogs';
 import RestTimer from './components/RestTimer';
 import BottomNav from './components/BottomNav';
 import UserProfileModal from './components/UserProfileModal';
+import UpdateBanner from './components/UpdateBanner';
 
 function WorkoutApp() {
   const { user, loading: authLoading, profile } = useAuth();
@@ -94,6 +95,11 @@ function WorkoutApp() {
           </div>
         </div>
       </header>
+
+      {/* UPDATE NOTIFICATION BANNER */}
+      <div className="max-w-lg w-full mx-auto relative z-30">
+        <UpdateBanner />
+      </div>
 
       {/* SCREEN CONTAINER */}
       <main className="flex-1 max-w-lg w-full mx-auto pb-28 px-4 pt-4 overflow-y-auto">
