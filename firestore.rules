@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Safety Net (Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper to verify user matches the userId parameter
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Prevent ID injection or poisoning
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity Validations (Pillar 2: Anti-Update-Gap)
+    function isValidWorkout(data) {
+      return data.keys().hasAll(['id', 'name', 'date', 'startTime', 'exercises'])
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.date is string && data.date.size() <= 100
+        && data.startTime is int
+        && data.exercises is list
+        && (data.keys().size() == 5 || (data.keys().size() == 6 && data.duration is int));
+    }
+
+    function isValidTemplate(data) {
+      return data.keys().hasAll(['name', 'exercises'])
+        && data.keys().size() == 2
+        && data.name is string && data.name.size() <= 200
+        && data.exercises is list;
+    }
+
+    function isValidExercise(data) {
+      return data.keys().hasAll(['id', 'name', 'muscle', 'type'])
+        && data.keys().size() == 4
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.muscle is string && data.muscle.size() <= 50
+        && data.type is string && data.type.size() <= 50;
+    }
+
+    // Match Rules for user subcollections
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId);
+
+      match /workouts/{workoutId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(workoutId) && isValidWorkout(request.resource.data);
+        allow update: if isOwner(userId) && isValidId(workoutId) && isValidWorkout(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /templates/{templateId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(templateId) && isValidTemplate(request.resource.data);
+        allow update: if isOwner(userId) && isValidId(templateId) && isValidTemplate(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /exercises/{exerciseId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(exerciseId) && isValidExercise(request.resource.data);
+        allow update: if isOwner(userId) && isValidId(exerciseId) && isValidExercise(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

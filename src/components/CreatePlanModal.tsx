@@ -1,0 +1,265 @@
+import { createElement, useState, ChangeEvent, useRef } from 'react';
+import { X, Search, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { capitalize, getMuscleColor } from '../utils/formatters';
+import { useWorkout } from '../context/WorkoutContext';
+
+export default function CreatePlanModal() {
+  const {
+    showCreatePlanModal,
+    setShowCreatePlanModal,
+    exercises,
+    handleCreatePlan,
+  } = useWorkout();
+
+  if (!showCreatePlanModal) return null;
+
+  const [planName, setPlanName] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+  const [muscleFilter, setMuscleFilter] = useState('');
+
+  const chipsRef = useRef<HTMLDivElement>(null);
+
+  const scrollChips = (direction: 'left' | 'right') => {
+    if (chipsRef.current) {
+      const scrollAmount = 140;
+      chipsRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleToggleExercise = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSave = () => {
+    const name = planName.trim();
+    if (!name) return;
+    handleCreatePlan(name, selectedIds);
+    setPlanName('');
+    setSelectedIds([]);
+    setSearch('');
+    setMuscleFilter('');
+    setShowCreatePlanModal(false);
+  };
+
+  const filtered = exercises.filter(e => {
+    const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase());
+    const matchesMuscle = !muscleFilter || e.muscle === muscleFilter;
+    return matchesSearch && matchesMuscle;
+  });
+
+  return createElement(
+    'div',
+    { className: 'fixed inset-0 bg-black/70 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4' },
+    createElement(
+      'div',
+      { className: 'bg-[#121212] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl overflow-hidden' },
+      
+      // Handle bar on mobile
+      createElement('div', { className: 'w-12 h-1 bg-neutral-800 rounded-full mx-auto mt-3 mb-1 sm:hidden' }),
+
+      // Header
+      createElement(
+        'div',
+        { className: 'p-4 border-b border-neutral-900 flex justify-between items-center bg-[#161618]' },
+        createElement(
+          'div',
+          null,
+          createElement('h3', { className: 'text-sm font-extrabold text-neutral-100' }, 'Create New Workout Plan'),
+          createElement('p', { className: 'text-[10px] text-neutral-500 mt-0.5' }, 'Design a workout blueprint to launch instantly anytime.')
+        ),
+        createElement(
+          'button',
+          {
+            onClick: () => setShowCreatePlanModal(false),
+            className: 'text-neutral-500 hover:text-neutral-300 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer'
+          },
+          createElement(X, { className: 'w-4 h-4' })
+        )
+      ),
+
+      // Plan Name Input Field
+      createElement(
+        'div',
+        { className: 'p-4 border-b border-neutral-900 bg-[#0c0c0d] space-y-1.5' },
+        createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block' }, 'Plan Name'),
+        createElement('input', {
+          type: 'text',
+          placeholder: 'e.g., Upper Body Blaster, Heavy Legs...',
+          value: planName,
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setPlanName(e.target.value),
+          className: 'w-full bg-neutral-900 border border-neutral-800 focus:border-emerald-500 text-xs rounded-xl px-3 py-2.5 text-neutral-100 focus:outline-none placeholder-neutral-600'
+        })
+      ),
+
+      // Exercise Selector Search & Filter Block
+      createElement(
+        'div',
+        { className: 'p-4 space-y-3 bg-[#0e0e10]/80 border-b border-neutral-900' },
+        createElement(
+          'span',
+          { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block' },
+          `Select Movements (${selectedIds.length} added)`
+        ),
+        
+        // Search
+        createElement(
+          'div',
+          { className: 'flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-2 rounded-xl focus-within:border-emerald-500' },
+          createElement(Search, { className: 'w-3.5 h-3.5 text-neutral-500' }),
+          createElement('input', {
+            type: 'text',
+            placeholder: 'Search library movements...',
+            value: search,
+            onChange: (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
+            className: 'w-full bg-transparent border-none text-xs text-neutral-200 focus:outline-none placeholder-neutral-600'
+          })
+        ),
+
+        // Muscle Selector Chips Carousel
+        createElement(
+          'div',
+          { className: 'relative flex items-center px-7' },
+          
+          // Left Arrow Button
+          createElement(
+            'button',
+            {
+              onClick: () => scrollChips('left'),
+              className: 'absolute left-0 z-10 p-1.5 rounded-lg bg-neutral-900/90 text-neutral-400 hover:text-emerald-400 cursor-pointer shadow-md hover:bg-neutral-800 active:scale-95 transition-all flex items-center justify-center'
+            },
+            createElement(ChevronLeft, { className: 'w-3.5 h-3.5' })
+          ),
+
+          // Chips Container
+          createElement(
+            'div',
+            {
+              ref: chipsRef,
+              className: 'flex gap-1.5 overflow-x-auto py-0.5 no-scrollbar scroll-smooth w-full'
+            },
+            createElement(
+              'button',
+              {
+                onClick: () => setMuscleFilter(''),
+                className: `px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                  muscleFilter === ''
+                    ? 'bg-emerald-500 text-black border-emerald-500'
+                    : 'bg-neutral-900 text-neutral-400 border-neutral-800'
+                }`
+              },
+              'All'
+            ),
+            ['chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio'].map(m =>
+              createElement(
+                'button',
+                {
+                  key: m,
+                  onClick: () => setMuscleFilter(m === muscleFilter ? '' : m),
+                  className: `px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                    muscleFilter === m
+                      ? 'bg-emerald-500 text-black border-emerald-500'
+                      : 'bg-neutral-900 text-neutral-400 border-neutral-800'
+                  }`
+                },
+                capitalize(m)
+              )
+            )
+          ),
+
+          // Right Arrow Button
+          createElement(
+            'button',
+            {
+              onClick: () => scrollChips('right'),
+              className: 'absolute right-0 z-10 p-1.5 rounded-lg bg-neutral-900/90 text-neutral-400 hover:text-emerald-400 cursor-pointer shadow-md hover:bg-neutral-800 active:scale-95 transition-all flex items-center justify-center'
+            },
+            createElement(ChevronRight, { className: 'w-3.5 h-3.5' })
+          )
+        )
+      ),
+
+      // Scrollable Exercise List
+      createElement(
+        'div',
+        { className: 'flex-1 overflow-y-auto p-4 space-y-1.5 bg-[#09090b]' },
+        filtered.length === 0
+          ? createElement(
+              'div',
+              { className: 'text-center py-6 text-xs text-neutral-500' },
+              'No exercises found matching current search.'
+            )
+          : filtered.map(ex => {
+              const isSelected = selectedIds.includes(ex.id);
+              return createElement(
+                'div',
+                {
+                  key: ex.id,
+                  onClick: () => handleToggleExercise(ex.id),
+                  className: `border p-2.5 rounded-xl flex justify-between items-center transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      : 'bg-neutral-900/30 border-neutral-800/80 hover:bg-neutral-900 hover:border-neutral-700'
+                  }`
+                },
+                createElement(
+                  'div',
+                  { className: 'flex items-center gap-2.5' },
+                  createElement(
+                    'div',
+                    { className: `w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                      isSelected ? 'bg-emerald-500 border-emerald-500 text-black' : 'border-neutral-700 bg-neutral-900'
+                    }` },
+                    isSelected && createElement(X, { className: 'w-3 h-3 stroke-[3.5]' })
+                  ),
+                  createElement(
+                    'div',
+                    null,
+                    createElement('h4', { className: 'text-xs font-bold text-neutral-200' }, ex.name),
+                    createElement(
+                      'span',
+                      { className: 'text-[9px] text-neutral-500 font-mono mt-0.5 inline-block' },
+                      ex.type === 'weight' ? 'Weighted' : ex.type === 'bodyweight' ? 'Bodyweight' : 'Cardio'
+                    )
+                  )
+                ),
+                createElement(
+                  'span',
+                  { className: `text-[9px] font-mono px-1.5 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+                  capitalize(ex.muscle)
+                )
+              );
+            })
+      ),
+
+      // Footer
+      createElement(
+        'div',
+        { className: 'p-4 border-t border-neutral-900 bg-[#161618] flex items-center gap-3' },
+        createElement(
+          'button',
+          {
+            onClick: handleSave,
+            disabled: !planName.trim() || selectedIds.length === 0,
+            className: 'flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all'
+          },
+          createElement(X, { className: 'w-4 h-4' }),
+          createElement('span', null, 'Save Workout Plan')
+        ),
+        createElement(
+          'button',
+          {
+            onClick: () => setShowCreatePlanModal(false),
+            className: 'px-4 py-2.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-xs font-semibold rounded-xl cursor-pointer'
+          },
+          'Cancel'
+        )
+      )
+    )
+  );
+}

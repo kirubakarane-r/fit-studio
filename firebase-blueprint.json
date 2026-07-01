@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Exercise": {
+      "title": "Exercise",
+      "description": "A workout exercise movement",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "muscle": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "required": ["id", "name", "muscle", "type"]
+    },
+    "Template": {
+      "title": "Template",
+      "description": "A pre-designed workout plan template",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "exercises": { "type": "array" }
+      },
+      "required": ["name", "exercises"]
+    },
+    "Workout": {
+      "title": "Workout",
+      "description": "A logged workout session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "date": { "type": "string" },
+        "startTime": { "type": "number" },
+        "duration": { "type": "number" },
+        "exercises": { "type": "array" }
+      },
+      "required": ["id", "name", "date", "startTime", "exercises"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workouts/{workoutId}": {
+      "schema": "Workout",
+      "description": "User specific logged workout sessions"
+    },
+    "/users/{userId}/templates/{templateId}": {
+      "schema": "Template",
+      "description": "User specific custom templates/plans"
+    },
+    "/users/{userId}/exercises/{exerciseId}": {
+      "schema": "Exercise",
+      "description": "User specific custom created exercises"
+    }
+  }
+}
