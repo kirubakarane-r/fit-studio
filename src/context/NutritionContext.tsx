@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { FoodLogEntry, DailyNutrition, MealType } from '../types';
+import { FoodLogEntry, DailyNutrition, MealType, NutritionGoals } from '../types';
 import { useAuth } from './AuthContext';
 import { handleFirestoreError, OperationType } from './WorkoutContext';
 
@@ -9,12 +9,21 @@ export interface NutritionContextType {
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   dailyNutrition: DailyNutrition | null;
+  goals: NutritionGoals;
+  updateGoals: (newGoals: NutritionGoals) => Promise<void>;
   loading: boolean;
   addFoodLog: (food: Omit<FoodLogEntry, 'id' | 'timestamp'>) => Promise<void>;
   removeFoodLog: (logId: string) => Promise<void>;
 }
 
 const NutritionContext = createContext<NutritionContextType | undefined>(undefined);
+
+const DEFAULT_GOALS: NutritionGoals = {
+  calories: 2500,
+  protein: 150,
+  carbs: 250,
+  fat: 80
+};
 
 export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -26,8 +35,10 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
   
   const [dailyNutrition, setDailyNutrition] = useState<DailyNutrition | null>(null);
+  const [goals, setGoals] = useState<NutritionGoals>(DEFAULT_GOALS);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Sync Daily Nutrition
   useEffect(() => {
     if (!user) {
       setDailyNutrition(null);
@@ -64,6 +75,39 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (unsub) unsub();
     };
   }, [user, selectedDate]);
+
+  // Sync User Goals
+  useEffect(() => {
+    if (!user) return;
+    
+    let unsub: (() => void) | undefined;
+    try {
+      unsub = onSnapshot(doc(db, 'users', user.uid, 'settings', 'goals'), (docSnap) => {
+        if (docSnap.exists()) {
+          setGoals(docSnap.data() as NutritionGoals);
+        } else {
+          setGoals(DEFAULT_GOALS);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to setup onSnapshot for goals:', err);
+    }
+
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [user]);
+
+  const updateGoals = async (newGoals: NutritionGoals) => {
+    if (!user) return;
+    const path = `users/${user.uid}/settings/goals`;
+    try {
+      await setDoc(doc(db, 'users', user.uid, 'settings', 'goals'), newGoals);
+      setGoals(newGoals); // Optimistic UI update
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, path);
+    }
+  };
 
   const addFoodLog = async (foodData: Omit<FoodLogEntry, 'id' | 'timestamp'>) => {
     if (!user) return;
@@ -113,6 +157,8 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       selectedDate,
       setSelectedDate,
       dailyNutrition,
+      goals,
+      updateGoals,
       loading,
       addFoodLog,
       removeFoodLog

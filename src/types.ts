@@ -60,3 +60,10 @@ export interface DailyNutrition {
   date: string; // Format: YYYY-MM-DD
   logs: FoodLogEntry[];
 }
+
+export interface NutritionGoals {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
