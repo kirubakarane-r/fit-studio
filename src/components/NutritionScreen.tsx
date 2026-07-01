@@ -134,10 +134,10 @@ export default function NutritionScreen() {
         {/* Macros Breakdown */}
         <div className="grid grid-cols-3 gap-3">
           {/* Protein */}
-          <div className="bg-neutral-900/50 rounded-2xl p-3 border border-neutral-850">
+          <div className="bg-neutral-900/50 rounded-2xl p-3">
             <div className="flex justify-between items-end mb-2">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase">Protein</span>
-              <span className="text-[10px] font-mono text-neutral-300">{Math.round(totalProtein)}g</span>
+              <span className="text-xs font-bold text-neutral-400 uppercase">Protein</span>
+              <span className="text-xs font-mono text-neutral-200">{Math.round(totalProtein)}g</span>
             </div>
             <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
               <div 
@@ -145,14 +145,14 @@ export default function NutritionScreen() {
                 style={{ width: `${proProgress}%` }}
               />
             </div>
-            <p className="text-[9px] text-neutral-600 mt-1.5 text-right">{PROTEIN_GOAL}g goal</p>
+            <p className="text-xs text-neutral-500 mt-1.5 text-right">{PROTEIN_GOAL}g goal</p>
           </div>
 
           {/* Carbs */}
-          <div className="bg-neutral-900/50 rounded-2xl p-3 border border-neutral-850">
+          <div className="bg-neutral-900/50 rounded-2xl p-3">
             <div className="flex justify-between items-end mb-2">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase">Carbs</span>
-              <span className="text-[10px] font-mono text-neutral-300">{Math.round(totalCarbs)}g</span>
+              <span className="text-xs font-bold text-neutral-400 uppercase">Carbs</span>
+              <span className="text-xs font-mono text-neutral-200">{Math.round(totalCarbs)}g</span>
             </div>
             <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
               <div 
@@ -160,14 +160,14 @@ export default function NutritionScreen() {
                 style={{ width: `${carbProgress}%` }}
               />
             </div>
-            <p className="text-[9px] text-neutral-600 mt-1.5 text-right">{CARBS_GOAL}g goal</p>
+            <p className="text-xs text-neutral-500 mt-1.5 text-right">{CARBS_GOAL}g goal</p>
           </div>
 
           {/* Fat */}
-          <div className="bg-neutral-900/50 rounded-2xl p-3 border border-neutral-850">
+          <div className="bg-neutral-900/50 rounded-2xl p-3">
             <div className="flex justify-between items-end mb-2">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase">Fat</span>
-              <span className="text-[10px] font-mono text-neutral-300">{Math.round(totalFat)}g</span>
+              <span className="text-xs font-bold text-neutral-400 uppercase">Fat</span>
+              <span className="text-xs font-mono text-neutral-200">{Math.round(totalFat)}g</span>
             </div>
             <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
               <div 
@@ -175,7 +175,7 @@ export default function NutritionScreen() {
                 style={{ width: `${fatProgress}%` }}
               />
             </div>
-            <p className="text-[9px] text-neutral-600 mt-1.5 text-right">{FAT_GOAL}g goal</p>
+            <p className="text-xs text-neutral-500 mt-1.5 text-right">{FAT_GOAL}g goal</p>
           </div>
         </div>
       </div>
