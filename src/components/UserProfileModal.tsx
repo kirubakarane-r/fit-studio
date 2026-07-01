@@ -24,7 +24,6 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   const [height, setHeight] = useState('');
   const [gender, setGender] = useState('');
   const [goal, setGoal] = useState('');
-  const [isGoalDropdownOpen, setIsGoalDropdownOpen] = useState(false);
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +52,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
     }
   };
 
-  // Read uploaded picture file as base64 data url
+  // Read uploaded picture file, resize it using canvas, and convert to base64
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -63,16 +62,40 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
       return;
     }
 
-    // Limit base64 length to around 1MB for smooth firestore sync
-    if (file.size > 1 * 1024 * 1024) {
-      setError('Please choose an image under 1MB for optimized performance.');
-      return;
-    }
-
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPhotoURL(reader.result as string);
-      setError(null);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 400;
+        const MAX_HEIGHT = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round(height * (MAX_WIDTH / width));
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round(width * (MAX_HEIGHT / height));
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Compress to JPEG to ensure it's very small for Firestore sync
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setPhotoURL(dataUrl);
+        setError(null);
+      };
+      img.onerror = () => setError('Failed to process image file.');
+      img.src = reader.result as string;
     };
     reader.onerror = () => {
       setError('Failed to read selected image file.');
@@ -104,8 +127,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
-        onClose();
-      }, 1500);
+      }, 3000);
     } catch (err: any) {
       console.error('Error saving user profile details:', err);
       setError(err?.message || 'Failed to update user profile details. Please try again.');
@@ -296,73 +318,23 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   <span>Fitness Focus & Goal</span>
                 </label>
                 <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsGoalDropdownOpen(!isGoalDropdownOpen)}
-                    className="w-full bg-neutral-950 border border-neutral-850 hover:border-neutral-700 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-300 focus:outline-none font-semibold transition-all flex items-center justify-between cursor-pointer"
+                  <select
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-850 hover:border-neutral-700 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-300 focus:outline-none font-semibold transition-all appearance-none cursor-pointer"
                   >
-                    <span>
-                      {goal ? (
-                        <>
-                          <span className="mr-1.5">{GOAL_OPTIONS.find(opt => opt.value === goal)?.icon}</span>
-                          <span>{GOAL_OPTIONS.find(opt => opt.value === goal)?.label}</span>
-                        </>
-                      ) : (
-                        <span className="text-neutral-500">Select your target objective...</span>
-                      )}
-                    </span>
-                    <svg 
-                      className={`w-4 h-4 text-neutral-500 transition-transform duration-200 ${isGoalDropdownOpen ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      viewBox="0 0 24 24"
-                    >
+                    <option value="">Select your target objective...</option>
+                    {GOAL_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.icon} {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  </button>
-
-                  {isGoalDropdownOpen && (
-                    <>
-                      {/* Invisible backdrop to close the dropdown */}
-                      <div 
-                        className="fixed inset-0 z-30 cursor-default" 
-                        onClick={() => setIsGoalDropdownOpen(false)}
-                      />
-                      <div className="absolute left-0 right-0 mt-1.5 bg-[#121214] border border-neutral-850 rounded-xl shadow-2xl z-40 max-h-60 overflow-y-auto py-1 animate-in fade-in-50 slide-in-from-top-1 duration-100">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setGoal('');
-                            setIsGoalDropdownOpen(false);
-                          }}
-                          className={`w-full text-left px-4 py-2.5 text-xs text-neutral-400 hover:bg-neutral-900 transition-colors flex items-center justify-between cursor-pointer ${
-                            !goal ? 'text-emerald-400 font-bold bg-neutral-900/40' : ''
-                          }`}
-                        >
-                          <span>Select your target objective...</span>
-                          {!goal && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                        </button>
-                        {GOAL_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => {
-                              setGoal(opt.value);
-                              setIsGoalDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-4 py-2.5 text-xs text-neutral-200 hover:bg-neutral-900 transition-colors flex items-center gap-2 cursor-pointer ${
-                              goal === opt.value ? 'text-emerald-400 font-bold bg-neutral-900/40' : ''
-                            }`}
-                          >
-                            <span className="text-sm">{opt.icon}</span>
-                            <span className="flex-1">{opt.label}</span>
-                            {goal === opt.value && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
+                  </div>
                 </div>
               </div>
 

@@ -153,8 +153,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }) => {
     if (!auth.currentUser) throw new Error('No user is currently signed in.');
     try {
-      setLoading(true);
-
       const isBase64 = data.photoURL && data.photoURL.startsWith('data:');
       
       // Update Firebase Auth display name and photoURL (only if not base64)
@@ -192,8 +190,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Failed to update profile:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
