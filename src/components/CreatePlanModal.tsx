@@ -54,6 +54,9 @@ export default function CreatePlanModal() {
     return matchesSearch && matchesMuscle;
   });
 
+  const hasExactMatch = exercises.some(e => e.name.toLowerCase() === search.trim().toLowerCase());
+  const showCreateMovementBtn = search.trim().length > 0 && !hasExactMatch;
+
   return createElement(
     'div',
     { className: 'fixed inset-0 bg-black/70 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4' },
@@ -219,7 +222,7 @@ export default function CreatePlanModal() {
       ),
 
       // Create Custom Exercise Action
-      createElement(
+      showCreateMovementBtn && createElement(
         'div',
         { className: 'p-4 border-t border-neutral-900 bg-neutral-950/20 flex flex-col' },
         createElement(

@@ -24,6 +24,9 @@ export default function AddExerciseModal() {
     return matchesSearch && matchesMuscle;
   });
 
+  const hasExactMatch = exercises.some(e => e.name.toLowerCase() === exerciseSearch.trim().toLowerCase());
+  const showCreateMovementBtn = exerciseSearch.trim().length > 0 && !hasExactMatch;
+
   const handleSelectExercise = (id: string) => {
     handleAddExerciseToActive(id);
     setShowAddExerciseModal(false);
@@ -158,7 +161,7 @@ export default function AddExerciseModal() {
       ),
 
       // Footer create action button
-      createElement(
+      showCreateMovementBtn && createElement(
         'div',
         { className: 'p-4 border-t border-neutral-900 bg-neutral-950/20 flex flex-col' },
         createElement(
