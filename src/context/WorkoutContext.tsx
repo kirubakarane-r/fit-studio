@@ -418,7 +418,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const path = `users/${user.uid}/templates`;
     try {
       const id = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-      await setDoc(doc(db, 'users', user.uid, 'templates', id), newTemplate);
+      setDoc(doc(db, 'users', user.uid, 'templates', id), newTemplate);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
@@ -447,7 +447,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const path = `users/${user.uid}/templates`;
     try {
       const id = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-      await deleteDoc(doc(db, 'users', user.uid, 'templates', id));
+      deleteDoc(doc(db, 'users', user.uid, 'templates', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, path);
     }
@@ -493,7 +493,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const path = `users/${user.uid}/templates`;
       try {
         const id = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-        await setDoc(doc(db, 'users', user.uid, 'templates', id), newTemplate);
+        setDoc(doc(db, 'users', user.uid, 'templates', id), newTemplate);
       } catch (err) {
         handleFirestoreError(err, OperationType.WRITE, path);
       }
@@ -598,7 +598,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const path = `users/${user.uid}/workouts`;
     try {
-      await setDoc(doc(db, 'users', user.uid, 'workouts', loggedWorkout.id), loggedWorkout);
+      setDoc(doc(db, 'users', user.uid, 'workouts', loggedWorkout.id), loggedWorkout);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
@@ -613,7 +613,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) return;
     const path = `users/${user.uid}/workouts`;
     try {
-      await deleteDoc(doc(db, 'users', user.uid, 'workouts', id));
+      deleteDoc(doc(db, 'users', user.uid, 'workouts', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, path);
     }
@@ -638,7 +638,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const path = `users/${user.uid}/exercises`;
     try {
-      await setDoc(doc(db, 'users', user.uid, 'exercises', newEx.id), newEx);
+      setDoc(doc(db, 'users', user.uid, 'exercises', newEx.id), newEx);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
@@ -650,7 +650,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) return;
     const path = `users/${user.uid}/exercises`;
     try {
-      await deleteDoc(doc(db, 'users', user.uid, 'exercises', id));
+      deleteDoc(doc(db, 'users', user.uid, 'exercises', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, path);
     }
@@ -709,7 +709,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!editingWorkoutDraft || !user) return;
     const path = `users/${user.uid}/workouts`;
     try {
-      await setDoc(doc(db, 'users', user.uid, 'workouts', editingWorkoutDraft.id), editingWorkoutDraft);
+      setDoc(doc(db, 'users', user.uid, 'workouts', editingWorkoutDraft.id), editingWorkoutDraft);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
