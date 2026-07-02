@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { Dumbbell, History, TrendingUp, BookOpen, Utensils } from 'lucide-react';
+import { Dumbbell, History, TrendingUp, BookOpen } from 'lucide-react';
 import { useWorkout } from '../context/WorkoutContext';
 
 export default function BottomNav() {
@@ -51,19 +51,6 @@ export default function BottomNav() {
         createElement('span', null, 'Progress')
       ),
 
-
-      // Nutrition button
-      createElement(
-        'button',
-        {
-          onClick: () => navigateTo('nutrition'),
-          className: `flex-1 flex flex-col items-center justify-center gap-1 h-full text-[10px] font-bold tracking-tight cursor-pointer ${
-            screen === 'nutrition' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-300'
-          }`
-        },
-        createElement(Utensils, { className: 'w-5 h-5' }),
-        createElement('span', null, 'Nutrition')
-      )
     )
   );
 }
