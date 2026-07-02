@@ -1,5 +1,5 @@
 import { createElement, useState, ChangeEvent, useRef } from 'react';
-import { X, Search, Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { X, Search, Check, ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown } from 'lucide-react';
 import { capitalize, getMuscleColor } from '../utils/formatters';
 import { useWorkout } from '../context/WorkoutContext';
 
@@ -37,6 +37,28 @@ export default function CreatePlanModal() {
     );
   };
 
+  const handleMoveUp = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setSelectedIds(prev => {
+      const idx = prev.indexOf(id);
+      if (idx <= 0) return prev;
+      const copy = [...prev];
+      [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
+      return copy;
+    });
+  };
+
+  const handleMoveDown = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setSelectedIds(prev => {
+      const idx = prev.indexOf(id);
+      if (idx === -1 || idx === prev.length - 1) return prev;
+      const copy = [...prev];
+      [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]];
+      return copy;
+    });
+  };
+
   const handleSave = () => {
     const name = planName.trim();
     if (!name) return;
@@ -53,10 +75,11 @@ export default function CreatePlanModal() {
     const matchesMuscle = !muscleFilter || e.muscle === muscleFilter;
     return matchesSearch && matchesMuscle;
   }).sort((a, b) => {
-    const aSelected = selectedIds.includes(a.id);
-    const bSelected = selectedIds.includes(b.id);
-    if (aSelected && !bSelected) return -1;
-    if (!aSelected && bSelected) return 1;
+    const aIdx = selectedIds.indexOf(a.id);
+    const bIdx = selectedIds.indexOf(b.id);
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return -1;
+    if (bIdx !== -1) return 1;
     return 0;
   });
 
@@ -219,9 +242,33 @@ export default function CreatePlanModal() {
                   )
                 ),
                 createElement(
-                  'span',
-                  { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
-                  capitalize(ex.muscle)
+                  'div',
+                  { className: 'flex items-center gap-2' },
+                  createElement(
+                    'span',
+                    { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+                    capitalize(ex.muscle)
+                  ),
+                  isSelected && createElement(
+                    'div',
+                    { className: 'flex flex-col gap-0.5 ml-1' },
+                    createElement(
+                      'button',
+                      {
+                        onClick: (e: any) => handleMoveUp(e, ex.id),
+                        className: 'p-1 rounded-md bg-neutral-800 hover:bg-neutral-700 text-neutral-400'
+                      },
+                      createElement(ChevronUp, { className: 'w-3 h-3' })
+                    ),
+                    createElement(
+                      'button',
+                      {
+                        onClick: (e: any) => handleMoveDown(e, ex.id),
+                        className: 'p-1 rounded-md bg-neutral-800 hover:bg-neutral-700 text-neutral-400'
+                      },
+                      createElement(ChevronDown, { className: 'w-3 h-3' })
+                    )
+                  )
                 )
               );
             })
