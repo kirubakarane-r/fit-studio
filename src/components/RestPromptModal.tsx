@@ -38,8 +38,8 @@ export default function RestPromptModal() {
       // Duration Option Buttons
       createElement(
         'div',
-        { className: 'grid grid-cols-3 gap-2.5' },
-        [30, 60, 90].map(seconds =>
+        { className: 'grid grid-cols-4 gap-2.5' },
+        [30, 60, 90, 120].map(seconds =>
           createElement(
             'button',
             {
