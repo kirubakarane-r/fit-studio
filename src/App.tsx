@@ -17,6 +17,7 @@ import AddExerciseModal from './components/AddExerciseModal';
 import CreateExerciseModal from './components/CreateExerciseModal';
 import CreatePlanModal from './components/CreatePlanModal';
 import RestPromptModal from './components/RestPromptModal';
+import TemplateDetailModal from './components/TemplateDetailModal';
 import WorkoutDetailModal from './components/WorkoutDetailModal';
 import ConfirmDialogs from './components/ConfirmDialogs';
 import RestTimer from './components/RestTimer';
@@ -144,6 +145,7 @@ function WorkoutApp() {
 
       {/* Workout Detail and Edit View Sheet */}
       <WorkoutDetailModal />
+      <TemplateDetailModal />
 
       {/* Dialog confirmations */}
       <ConfirmDialogs />
