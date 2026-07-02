@@ -24,8 +24,8 @@ export default function AddExerciseModal() {
     return matchesSearch && matchesMuscle;
   });
 
-  const hasExactMatch = exercises.some(e => e.name.toLowerCase() === exerciseSearch.trim().toLowerCase());
-  const showCreateMovementBtn = exerciseSearch.trim().length > 0 && !hasExactMatch;
+  const hasMatch = exercises.some(e => e.name.toLowerCase().includes(exerciseSearch.trim().toLowerCase()));
+  const showCreateMovementBtn = exerciseSearch.trim().length > 0 && !hasMatch;
 
   const handleSelectExercise = (id: string) => {
     handleAddExerciseToActive(id);

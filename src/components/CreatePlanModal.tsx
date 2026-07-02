@@ -54,8 +54,8 @@ export default function CreatePlanModal() {
     return matchesSearch && matchesMuscle;
   });
 
-  const hasExactMatch = exercises.some(e => e.name.toLowerCase() === search.trim().toLowerCase());
-  const showCreateMovementBtn = search.trim().length > 0 && !hasExactMatch;
+  const hasMatch = exercises.some(e => e.name.toLowerCase().includes(search.trim().toLowerCase()));
+  const showCreateMovementBtn = search.trim().length > 0 && !hasMatch;
 
   return createElement(
     'div',
