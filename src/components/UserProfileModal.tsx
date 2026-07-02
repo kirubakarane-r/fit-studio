@@ -179,9 +179,10 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <form onSubmit={handleSave} className="space-y-6">
+        {/* Form Container wrapping both scrollable body and fixed footer */}
+        <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
             
             {error && (
               <div className="p-3 bg-red-950/20 border border-red-500/20 rounded-xl text-xs text-red-400 text-center leading-relaxed">
@@ -402,48 +403,48 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                 />
               </div>
 
-              {/* Form Actions Footer */}
-              <div className="space-y-3 pt-4 border-t border-neutral-900">
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    disabled={saving}
-                    onClick={onClose}
-                    className="flex-1 py-2.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-xs font-semibold rounded-xl cursor-pointer transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving || !displayName.trim()}
-                    className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-lg shadow-emerald-500/5 border-t border-white/20"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Saving...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Save</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+          </div>
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full py-2.5 bg-red-950/20 hover:bg-red-950/45 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Log Out</span>
-                </button>
-              </div>
+          {/* Fixed Form Actions Footer */}
+          <div className="p-5 border-t border-neutral-900 bg-[#161618] space-y-3 shrink-0">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={onClose}
+                className="flex-1 py-2.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-xs font-semibold rounded-xl cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving || !displayName.trim()}
+                className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-lg shadow-emerald-500/5 border-t border-white/20"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Save</span>
+                  </>
+                )}
+              </button>
+            </div>
 
-            </form>
-        </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full py-2.5 bg-red-950/20 hover:bg-red-950/45 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Log Out</span>
+            </button>
+          </div>
+        </form>
 
       </div>
     </div>
