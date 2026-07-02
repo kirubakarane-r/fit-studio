@@ -96,6 +96,8 @@ export interface WorkoutContextType {
   setShowRestPrompt: React.Dispatch<React.SetStateAction<boolean>>;
   pendingDeleteWorkoutId: string | null;
   setPendingDeleteWorkoutId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedTemplateToView: Template | null;
+  setSelectedTemplateToView: React.Dispatch<React.SetStateAction<Template | null>>;
 
   // Form / Input States
   newWorkoutName: string;
@@ -381,6 +383,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
   const [showRestPrompt, setShowRestPrompt] = useState(false);
   const [pendingDeleteWorkoutId, setPendingDeleteWorkoutId] = useState<string | null>(null);
+  const [selectedTemplateToView, setSelectedTemplateToView] = useState<Template | null>(null);
 
   // --------------------------------------------------
   // FORM / INPUT STATES
@@ -822,6 +825,8 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setShowRestPrompt,
       pendingDeleteWorkoutId,
       setPendingDeleteWorkoutId,
+      selectedTemplateToView,
+      setSelectedTemplateToView,
       newWorkoutName,
       setNewWorkoutName,
       saveAsTemplate,

@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { Plus, Play, ArrowRight, Trash2 } from 'lucide-react';
+import { Plus, Play, ArrowRight, Trash2, Eye } from 'lucide-react';
 import { Exercise } from '../types';
 import { formatTime, capitalize } from '../utils/formatters';
 import { useWorkout } from '../context/WorkoutContext';
@@ -15,6 +15,7 @@ export default function HomeScreen() {
     setShowCreatePlanModal,
     handleStartWorkoutFromTemplate,
     handleDeleteTemplate,
+    setSelectedTemplateToView,
   } = useWorkout();
 
   const activeWorkoutBanner = activeWorkout
@@ -107,13 +108,26 @@ export default function HomeScreen() {
                 )
               : null,
             createElement(
-              'button',
-              {
-                onClick: () => handleStartWorkoutFromTemplate(tpl),
-                className: 'w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer mt-1 font-sans transition-colors'
-              },
-              createElement(Play, { className: 'w-3.5 h-3.5 fill-black' }),
-              createElement('span', null, 'Start Session (Timer Enabled)')
+              'div',
+              { className: 'grid grid-cols-2 gap-2 mt-1' },
+              createElement(
+                'button',
+                {
+                  onClick: () => setSelectedTemplateToView(tpl),
+                  className: 'py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors'
+                },
+                createElement(Eye, { className: 'w-3.5 h-3.5' }),
+                createElement('span', null, 'View Plan')
+              ),
+              createElement(
+                'button',
+                {
+                  onClick: () => handleStartWorkoutFromTemplate(tpl),
+                  className: 'py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors'
+                },
+                createElement(Play, { className: 'w-3.5 h-3.5 fill-black' }),
+                createElement('span', null, 'Start Session')
+              )
             )
           );
         })
