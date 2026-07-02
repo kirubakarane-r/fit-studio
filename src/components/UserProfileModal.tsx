@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { X, Upload, Scale, Ruler, Target, Check, Loader2, User as UserIcon, LogOut } from 'lucide-react';
+import { X, Upload, Scale, Ruler, Target, Check, Loader2, User as UserIcon, LogOut, ChevronDown } from 'lucide-react';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -26,6 +26,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   const [goal, setGoal] = useState('');
   const [age, setAge] = useState('');
   const [medicalIssue, setMedicalIssue] = useState('');
+  
+  const [isGoalDropdownOpen, setIsGoalDropdownOpen] = useState(false);
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -353,23 +355,48 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   <span>Fitness Focus & Goal</span>
                 </label>
                 <div className="relative">
-                  <select
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-850 hover:border-neutral-700 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-300 focus:outline-none font-semibold transition-all appearance-none cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => setIsGoalDropdownOpen(!isGoalDropdownOpen)}
+                    className="w-full flex justify-between items-center bg-neutral-950 border border-neutral-850 hover:border-neutral-700 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-300 focus:outline-none font-semibold transition-all cursor-pointer"
                   >
-                    <option value="">Select your target objective...</option>
-                    {GOAL_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.icon} {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
+                    <span>
+                      {goal 
+                        ? (() => {
+                            const opt = GOAL_OPTIONS.find(o => o.value === goal);
+                            return opt ? `${opt.icon} ${opt.label}` : goal;
+                          })()
+                        : 'Select your target objective...'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-neutral-500 transition-transform ${isGoalDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isGoalDropdownOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setIsGoalDropdownOpen(false)}
+                      />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden z-50 shadow-2xl flex flex-col">
+                        {GOAL_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setGoal(opt.value);
+                              setIsGoalDropdownOpen(false);
+                            }}
+                            className={`text-left px-4 py-3 hover:bg-neutral-800 cursor-pointer text-xs font-semibold transition-colors flex items-center gap-2 ${
+                              goal === opt.value ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-200'
+                            }`}
+                          >
+                            <span>{opt.icon}</span>
+                            <span>{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
