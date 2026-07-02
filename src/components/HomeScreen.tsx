@@ -61,7 +61,7 @@ export default function HomeScreen() {
       )
     : createElement(
         'div',
-        { className: 'space-y-3 max-h-[360px] overflow-y-auto pr-0.5' },
+        { className: 'space-y-3' },
         templates.map(tpl => {
           const tplExercises = tpl.exercises
             .map(eid => exercises.find(e => e.id === eid))
