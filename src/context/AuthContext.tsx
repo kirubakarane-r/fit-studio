@@ -71,8 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             medicalIssue: existingData.medicalIssue || ''
           };
 
-          // Keep in sync
-          await setDoc(userRef, {
+          // Keep in sync (don't await this, otherwise it hangs indefinitely offline)
+          setDoc(userRef, {
             uid: currentUser.uid,
             displayName: profileData.displayName,
             email: currentUser.email || null,
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             age: profileData.age || null,
             medicalIssue: profileData.medicalIssue || null,
             lastActive: new Date().toISOString()
-          }, { merge: true });
+          }, { merge: true }).catch(e => console.warn('Offline profile sync pending or failed:', e));
 
           setProfile(profileData);
         } catch (e) {
@@ -175,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Update Firestore user document
       const userRef = doc(db, 'users', auth.currentUser.uid);
-      await setDoc(userRef, {
+      setDoc(userRef, {
         uid: auth.currentUser.uid,
         displayName: data.displayName,
         photoURL: data.photoURL,
