@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { X, Upload, Scale, Ruler, Target, Check, Loader2, User as UserIcon, LogOut, ChevronDown } from 'lucide-react';
+import { X, Upload, Scale, Ruler, Target, Check, Loader2, User as UserIcon, LogOut, ChevronDown, Users, Activity } from 'lucide-react';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -313,8 +313,9 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
               {/* Gender selection dropdown */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                  Gender
+                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Gender</span>
                 </label>
                 <div className="flex bg-neutral-950 p-1 rounded-xl border border-neutral-850">
                   {['Male', 'Female', 'Other'].map((g) => (
@@ -332,20 +333,6 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* Medical Issue */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                  Medical Issues / Injuries
-                </label>
-                <textarea
-                  value={medicalIssue}
-                  onChange={(e) => setMedicalIssue(e.target.value)}
-                  placeholder="e.g. Lower back pain, shoulder impingement..."
-                  rows={2}
-                  className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-semibold transition-colors resize-none"
-                />
               </div>
 
               {/* Goal dropdown / select list */}
@@ -398,6 +385,21 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                     </>
                   )}
                 </div>
+              </div>
+
+              {/* Medical Issue */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                  <Activity className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Medical Issues / Injuries</span>
+                </label>
+                <textarea
+                  value={medicalIssue}
+                  onChange={(e) => setMedicalIssue(e.target.value)}
+                  placeholder="e.g. Lower back pain, shoulder impingement..."
+                  rows={2}
+                  className="w-full bg-neutral-950 border border-neutral-850 focus:border-emerald-500 text-xs rounded-xl p-3 text-neutral-200 focus:outline-none font-semibold transition-colors resize-none"
+                />
               </div>
 
               {/* Form Actions Footer */}
