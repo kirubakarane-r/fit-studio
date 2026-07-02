@@ -168,10 +168,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isBase64 = data.photoURL && data.photoURL.startsWith('data:');
       
       // Update Firebase Auth display name and photoURL (only if not base64)
-      await updateProfile(auth.currentUser, {
-        displayName: data.displayName,
-        photoURL: isBase64 ? null : data.photoURL
-      });
+      try {
+        await updateProfile(auth.currentUser, {
+          displayName: data.displayName,
+          photoURL: isBase64 ? null : data.photoURL
+        });
+      } catch (err) {
+        console.warn('Failed to update Auth profile (likely offline):', err);
+      }
 
       // Update Firestore user document
       const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -186,7 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         age: data.age || null,
         medicalIssue: data.medicalIssue || null,
         lastActive: new Date().toISOString()
-      }, { merge: true });
+      }, { merge: true }).catch(e => console.warn('Offline profile sync pending or failed:', e));
 
       // Update in-memory profile state
       setProfile({
@@ -201,7 +205,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       // Reload to ensure firebase user state is synced
-      await auth.currentUser.reload();
+      try {
+        await auth.currentUser.reload();
+      } catch (err) {
+        console.warn('Failed to reload Auth profile (likely offline):', err);
+      }
       setUser(auth.currentUser);
     } catch (error) {
       console.error('Failed to update profile:', error);

@@ -221,7 +221,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   <div className="flex-1 space-y-2">
                     {/* Custom File Uploader button */}
                     <div className="flex gap-2">
-                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-bold text-neutral-300 hover:text-neutral-100 rounded-xl cursor-pointer transition-colors">
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-bold text-neutral-300 hover:text-neutral-100 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
                         <Upload className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Upload Photo</span>
                         <input 
