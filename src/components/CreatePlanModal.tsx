@@ -52,6 +52,12 @@ export default function CreatePlanModal() {
     const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase());
     const matchesMuscle = !muscleFilter || e.muscle === muscleFilter;
     return matchesSearch && matchesMuscle;
+  }).sort((a, b) => {
+    const aSelected = selectedIds.includes(a.id);
+    const bSelected = selectedIds.includes(b.id);
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
+    return 0;
   });
 
   const hasMatch = exercises.some(e => e.name.toLowerCase().includes(search.trim().toLowerCase()));
