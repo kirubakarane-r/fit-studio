@@ -2,6 +2,7 @@ import React from 'react';
 import { Dumbbell, Clock } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WorkoutProvider, useWorkout } from './context/WorkoutContext';
+import { NutritionProvider } from './context/NutritionContext';
 
 // Screen Components (consume useWorkout)
 import HomeScreen from './components/HomeScreen';
@@ -9,12 +10,16 @@ import ActiveWorkoutScreen from './components/ActiveWorkoutScreen';
 import HistoryScreen from './components/HistoryScreen';
 import ProgressScreen from './components/ProgressScreen';
 import ExercisesScreen from './components/ExercisesScreen';
+import NutritionScreen from './components/NutritionScreen';
 import LoginScreen from './components/LoginScreen';
 
 // Modals, Overlays & Navigation
 import NewWorkoutModal from './components/NewWorkoutModal';
 import AddExerciseModal from './components/AddExerciseModal';
 import CreateExerciseModal from './components/CreateExerciseModal';
+import AddFoodModal from './components/AddFoodModal';
+import CreateFoodModal from './components/CreateFoodModal';
+import EditTargetModal from './components/EditTargetModal';
 import CreatePlanModal from './components/CreatePlanModal';
 import RestPromptModal from './components/RestPromptModal';
 import TemplateDetailModal from './components/TemplateDetailModal';
@@ -118,6 +123,7 @@ function WorkoutApp() {
             {screen === 'history' && <HistoryScreen />}
             {screen === 'progress' && <ProgressScreen />}
             {screen === 'exercises' && <ExercisesScreen />}
+            {screen === 'nutrition' && <NutritionScreen />}
           </>
         )}
       </main>
@@ -140,6 +146,11 @@ function WorkoutApp() {
       {/* Create Custom Workout Plan Modal */}
       <CreatePlanModal />
 
+      {/* Food Modals */}
+      <AddFoodModal />
+      <CreateFoodModal />
+      <EditTargetModal />
+
       {/* Rest Duration Option Prompt Modal */}
       <RestPromptModal />
 
@@ -159,9 +170,11 @@ function WorkoutApp() {
 export default function App() {
   return (
     <AuthProvider>
-      <WorkoutProvider>
-        <WorkoutApp />
-      </WorkoutProvider>
+      <NutritionProvider>
+        <WorkoutProvider>
+          <WorkoutApp />
+        </WorkoutProvider>
+      </NutritionProvider>
     </AuthProvider>
   );
 }

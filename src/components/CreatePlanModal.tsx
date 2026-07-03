@@ -104,7 +104,7 @@ export default function CreatePlanModal() {
         createElement(
           'div',
           null,
-          createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, editingTemplate ? 'Edit Workout Plan' : 'Create New Workout Plan'),
+          createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, editingTemplate ? 'Edit Workout Plan' : 'New Workout Plan'),
           createElement('p', { className: 'text-xs text-neutral-500 mt-0.5' }, 'Design a workout blueprint to launch instantly anytime.')
         ),
         createElement(

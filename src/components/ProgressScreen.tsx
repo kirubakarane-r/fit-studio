@@ -1,5 +1,5 @@
 import { createElement, Fragment, useState } from 'react';
-import { TrendingUp, Medal, Calendar } from 'lucide-react';
+import { TrendingUp, Medal, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import MuscleDistributionChart from './MuscleDistributionChart';
 import { useWorkout } from '../context/WorkoutContext';
 import { formatDateShort } from '../utils/formatters';
@@ -7,6 +7,92 @@ import { formatDateShort } from '../utils/formatters';
 export default function ProgressScreen() {
   const { workouts, exercises, personalRecords } = useWorkout();
   const [activeTab, setActiveTab] = useState<string>('');
+  const [weekOffset, setWeekOffset] = useState<number>(0);
+
+  const getWeekStats = (offset: number) => {
+    const nowTime = new Date();
+    const weekStart = new Date(nowTime);
+    // Adjust for offset (offset * 7 days)
+    weekStart.setDate(nowTime.getDate() - nowTime.getDay() + (offset * 7));
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+
+    const weekWorkouts = workouts.filter(w => {
+      const d = new Date(w.date);
+      return d >= weekStart && d < weekEnd;
+    });
+
+    let totalVolume = 0;
+    let completedSetsCount = 0;
+
+    weekWorkouts.forEach(w => {
+      w.exercises.forEach(ex => {
+        ex.sets.forEach(s => {
+          if (s.done) {
+            completedSetsCount++;
+            const weight = parseFloat(s.weight) || 0;
+            const reps = parseInt(s.reps) || 0;
+            totalVolume += weight * reps;
+          }
+        });
+      });
+    });
+
+    const formatStr = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const weekEndDisplay = new Date(weekEnd);
+    weekEndDisplay.setDate(weekEndDisplay.getDate() - 1);
+    
+    return {
+      workoutsCount: weekWorkouts.length,
+      volume: totalVolume,
+      sets: completedSetsCount,
+      dateRange: `${formatStr(weekStart)} - ${formatStr(weekEndDisplay)}`
+    };
+  };
+
+  const weekStats = getWeekStats(weekOffset);
+
+  const weekStatsContent = createElement(
+    'div',
+    { className: 'space-y-4 mb-8' },
+    createElement(
+      'div',
+      { className: 'flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl' },
+      createElement('button', { onClick: () => setWeekOffset(prev => prev - 1), className: 'p-2 hover:bg-neutral-800 rounded-lg cursor-pointer' }, createElement(ChevronLeft, { className: 'w-5 h-5 text-neutral-400' })),
+      createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'This Week' : weekStats.dateRange),
+      createElement('button', { onClick: () => setWeekOffset(prev => prev + 1), disabled: weekOffset >= 0, className: `p-2 rounded-lg ${weekOffset >= 0 ? 'opacity-50' : 'hover:bg-neutral-800 cursor-pointer'}` }, createElement(ChevronRight, { className: 'w-5 h-5 text-neutral-400' }))
+    ),
+    createElement(
+      'div',
+      { className: 'grid grid-cols-2 gap-3' },
+      createElement(
+        'div',
+        { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg' },
+        createElement('span', { className: 'text-[11px] font-semibold text-neutral-400 uppercase tracking-wider' }, 'Workouts'),
+        createElement(
+          'div',
+          { className: 'mt-3 flex items-baseline gap-1' },
+          createElement('span', { className: 'text-3xl font-extrabold text-neutral-100' }, weekStats.workoutsCount),
+          createElement('span', { className: 'text-xs text-neutral-500' }, 'logged')
+        ),
+        createElement('span', { className: 'text-[10px] text-neutral-500 mt-1' }, 'workouts total')
+      ),
+      createElement(
+        'div',
+        { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg' },
+        createElement('span', { className: 'text-[11px] font-semibold text-neutral-400 uppercase tracking-wider' }, 'Weekly Volume'),
+        createElement(
+          'div',
+          { className: 'mt-3 flex items-baseline gap-1' },
+          createElement('span', { className: 'text-3xl font-extrabold text-emerald-400' }, weekStats.volume >= 1000 ? `${(weekStats.volume / 1000).toFixed(1)}k` : weekStats.volume),
+          createElement('span', { className: 'text-xs text-neutral-500' }, 'kg')
+        ),
+        createElement('span', { className: 'text-[10px] text-neutral-500 mt-1' }, `${weekStats.sets} working sets finished`)
+      )
+    )
+  );
 
   const content = workouts.length === 0
     ? createElement(
@@ -56,17 +142,13 @@ export default function ProgressScreen() {
         return createElement(
           Fragment,
           null,
+          weekStatsContent,
           createElement(MuscleDistributionChart, { workouts, exercises }),
           
           createElement(
             'div',
             { className: 'mt-8' },
-            createElement(
-              'div',
-              { className: 'flex items-center gap-2 mb-6' },
-              createElement(Medal, { className: 'w-5 h-5 text-emerald-400' }),
-              createElement('h3', { className: 'text-lg font-extrabold text-neutral-100 tracking-tight' }, 'Personal Records')
-            ),
+            createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider mb-6' }, 'Personal Records'),
             
             Object.keys(groupedRecords).length === 0
               ? createElement(

@@ -30,3 +30,35 @@ export interface Workout {
   exercises: WorkoutExercise[];
 }
 
+export interface FoodItem {
+  id: string;
+  name: string;
+  brand?: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servingSize: string;
+}
+
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
+
+export interface MealEntry {
+  id: string;
+  foodId: string;
+  foodName: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servings: number;
+  mealType: MealType;
+  date: string;
+}
+
+export interface DailyNutritionTarget {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}

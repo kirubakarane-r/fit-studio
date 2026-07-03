@@ -137,43 +137,7 @@ export default function HomeScreen() {
     'div',
     { className: 'space-y-6' },
     
-    // Quick Stats Grid
-    createElement(
-      'div',
-      { className: 'grid grid-cols-2 gap-3' },
-      
-      // Stat 1: This Week
-      createElement(
-        'div',
-        { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between' },
-        createElement('span', { className: 'text-[11px] font-semibold text-neutral-400 uppercase tracking-wider' }, 'This Week'),
-        createElement(
-          'div',
-          { className: 'mt-3 flex items-baseline gap-1' },
-          createElement('span', { className: 'text-3xl font-extrabold text-neutral-100' }, weekStats.workoutsCount),
-          createElement('span', { className: 'text-xs text-neutral-500' }, 'logged')
-        ),
-        createElement('span', { className: 'text-[10px] text-neutral-500 mt-1' }, 'workouts total')
-      ),
 
-      // Stat 2: Weekly Volume
-      createElement(
-        'div',
-        { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between' },
-        createElement('span', { className: 'text-[11px] font-semibold text-neutral-400 uppercase tracking-wider' }, 'Weekly Volume'),
-        createElement(
-          'div',
-          { className: 'mt-3 flex items-baseline gap-1' },
-          createElement(
-            'span',
-            { className: 'text-3xl font-extrabold text-emerald-400' },
-            weekStats.volume >= 1000 ? `${(weekStats.volume / 1000).toFixed(1)}k` : weekStats.volume
-          ),
-          createElement('span', { className: 'text-xs text-neutral-500' }, 'kg')
-        ),
-        createElement('span', { className: 'text-[10px] text-neutral-500 mt-1' }, `${weekStats.sets} working sets finished`)
-      )
-    ),
 
     // Active Workout Banner
     activeWorkoutBanner,
