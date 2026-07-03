@@ -159,7 +159,8 @@ export default function NutritionScreen() {
   const remainingCals = target.calories - totals.calories;
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-4 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h2 className="text-base font-extrabold text-neutral-200 uppercase tracking-wider">Nutrition Log</h2>
       {/* Date Navigation */}
       <div className="flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl">
         <button onClick={handlePrevDay} className="p-2 hover:bg-neutral-800 rounded-lg cursor-pointer">

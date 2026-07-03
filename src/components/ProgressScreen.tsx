@@ -229,7 +229,7 @@ export default function ProgressScreen() {
 
   return createElement(
     'div',
-    { className: 'space-y-6 pb-20' },
+    { className: 'space-y-4 pb-20' },
     createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Metrics & Analytics'),
     content
   );
