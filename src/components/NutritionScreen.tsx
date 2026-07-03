@@ -190,14 +190,14 @@ export default function NutritionScreen() {
           </button>
         </div>
         
-        <div className="grid grid-cols-3 items-center mb-8">
-          <div className="flex flex-col items-center justify-center">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex-1 flex flex-col items-center justify-center">
             <span className="text-2xl font-black text-neutral-100">{Math.round(totals.calories)}</span>
             <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Eaten</span>
           </div>
           
-          <div className="relative w-32 h-32 flex flex-col items-center justify-center mx-auto">
-            <svg className="w-full h-full transform -rotate-90 absolute" viewBox="0 0 100 100">
+          <div className="relative w-32 h-32 flex-shrink-0 flex flex-col items-center justify-center mx-auto">
+            <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-neutral-800" />
               <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * calPercentage) / 100} className="text-emerald-500 transition-all duration-1000" />
             </svg>
@@ -207,7 +207,7 @@ export default function NutritionScreen() {
             </div>
           </div>
           
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center">
             <span className="text-2xl font-black text-neutral-100">{target.calories}</span>
             <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Goal</span>
           </div>

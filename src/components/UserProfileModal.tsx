@@ -221,7 +221,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
                   <div className="flex-1 space-y-2">
                     {/* Custom File Uploader button */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-bold text-neutral-300 hover:text-neutral-100 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
                         <Upload className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Upload Photo</span>
@@ -265,11 +265,11 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
               </div>
 
               {/* Physical details grid (Weight, Height, Age) */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
-                    <Scale className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Weight (kg)</span>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="flex flex-col justify-end space-y-1.5">
+                  <label className="text-[9px] sm:text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                    <Scale className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neutral-500 shrink-0" />
+                    <span className="leading-tight">Weight<br className="hidden sm:block"/>(kg)</span>
                   </label>
                   <input
                     type="number"
@@ -281,10 +281,10 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
-                    <Ruler className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Height (cm)</span>
+                <div className="flex flex-col justify-end space-y-1.5">
+                  <label className="text-[9px] sm:text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                    <Ruler className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neutral-500 shrink-0" />
+                    <span className="leading-tight">Height<br className="hidden sm:block"/>(cm)</span>
                   </label>
                   <input
                     type="number"
@@ -296,10 +296,10 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
-                    <span className="w-3.5 h-3.5 text-neutral-500 flex items-center justify-center font-bold text-[10px]">#</span>
-                    <span>Age</span>
+                <div className="flex flex-col justify-end space-y-1.5">
+                  <label className="text-[9px] sm:text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neutral-500 flex items-center justify-center font-bold text-[9px] sm:text-[10px] shrink-0">#</span>
+                    <span className="leading-tight">Age</span>
                   </label>
                   <input
                     type="number"

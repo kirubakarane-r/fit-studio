@@ -47,7 +47,7 @@ export default function RestTimer() {
           onClick: skipRestTimer,
           className: 'w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-sm font-bold rounded-xl border border-neutral-800 cursor-pointer transition-colors'
         },
-        'Skip Rest'
+        'Skip'
       )
     )
   );
