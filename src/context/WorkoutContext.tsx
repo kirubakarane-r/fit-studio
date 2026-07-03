@@ -355,6 +355,28 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       playNote(659.25, 0.2, 0.1);    // E5
       playNote(783.99, 0.3, 0.3);    // G5 (held longer)
       
+      // Show a native system notification if permitted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          // Attempt Service Worker notification first (required for some mobile browsers)
+          navigator.serviceWorker?.getRegistration().then(reg => {
+            if (reg) {
+              reg.showNotification('Rest Time is Over!', {
+                body: 'Time for your next set!',
+                vibrate: [200, 100, 200]
+              } as any);
+            } else {
+              new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
+            }
+          }).catch(() => {
+            new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
+          });
+        } catch (e) {
+          // Fallback
+          new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
+        }
+      }
+
     } catch (error) {
       console.error('Failed to play notification tone:', error);
     }
@@ -399,6 +421,11 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       if (silentAudioRef.current) {
         silentAudioRef.current.play().catch(() => {});
+      }
+      
+      // Request notification permission to show lock screen alerts
+      if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
       }
     } catch (e) {}
     

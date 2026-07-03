@@ -168,7 +168,15 @@ export default function NutritionScreen() {
         </button>
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-emerald-400" />
-          <span className="font-bold text-sm text-neutral-200">{selectedDate}</span>
+          <span className="font-bold text-sm text-neutral-200">
+            {(() => {
+              const today = new Date();
+              const offset = today.getTimezoneOffset();
+              const localDate = new Date(today.getTime() - (offset*60*1000));
+              const todayStr = localDate.toISOString().split('T')[0];
+              return selectedDate === todayStr ? 'Today' : selectedDate;
+            })()}
+          </span>
         </div>
         <button onClick={handleNextDay} className="p-2 hover:bg-neutral-800 rounded-lg cursor-pointer">
           <ChevronRight className="w-5 h-5 text-neutral-400" />
