@@ -154,9 +154,9 @@ export default function CreateFoodModal() {
                       setServingAmount(e.target.value);
                       setMacrosGenerated(false);
                     }}
-                    className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors placeholder-neutral-600"
+                    className="flex-1 min-w-0 bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors placeholder-neutral-600"
                   />
-                  <div className="relative w-28">
+                  <div className="relative w-24 sm:w-28 shrink-0">
                     <button
                       type="button"
                       onClick={() => setShowUnitDropdown(!showUnitDropdown)}
