@@ -296,7 +296,6 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [showRestTimer, setShowRestTimer] = useState<boolean>(false);
   const restTimerRef = useRef<NodeJS.Timeout | null>(null);
   const restEndTimeRef = useRef<number | null>(null);
-  const audioCtxRef = useRef<AudioContext | any>(null);
   const silentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize silent audio for background execution
@@ -320,65 +319,27 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => clearInterval(ticker);
   }, [activeWorkout]);
 
-  // Play an arcade "level up" style success sound on rest completion
-  const playRestCompletedTone = () => {
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioCtx) audioCtxRef.current = new AudioCtx();
-      }
-      const ctx = audioCtxRef.current;
-      if (!ctx) return;
-      if (ctx.state === 'suspended') ctx.resume();
-      
-      const playNote = (freq: number, startTime: number, duration: number) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'square'; // 'square' gives it that arcade 8-bit feel
-        
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-        
-        // Quick attack and release for that plucky arcade sound
-        gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
-        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.02);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + startTime + duration);
-        
-        osc.start(ctx.currentTime + startTime);
-        osc.stop(ctx.currentTime + startTime + duration);
-      };
-
-      // Play a fast ascending major arpeggio
-      playNote(392.00, 0.0, 0.1);    // G4
-      playNote(523.25, 0.1, 0.1);    // C5
-      playNote(659.25, 0.2, 0.1);    // E5
-      playNote(783.99, 0.3, 0.3);    // G5 (held longer)
-      
-      // Show a native system notification if permitted
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          // Attempt Service Worker notification first (required for some mobile browsers)
-          navigator.serviceWorker?.getRegistration().then(reg => {
-            if (reg) {
-              reg.showNotification('Rest Time is Over!', {
-                body: 'Time for your next set!',
-                vibrate: [200, 100, 200]
-              } as any);
-            } else {
-              new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
-            }
-          }).catch(() => {
+  // Show a native system notification on rest completion
+  const triggerRestCompletedNotification = () => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        // Attempt Service Worker notification first (required for some mobile browsers)
+        navigator.serviceWorker?.getRegistration().then(reg => {
+          if (reg) {
+            reg.showNotification('Rest Time is Over!', {
+              body: 'Time for your next set!',
+              vibrate: [200, 100, 200]
+            } as any);
+          } else {
             new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
-          });
-        } catch (e) {
-          // Fallback
+          }
+        }).catch(() => {
           new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
-        }
+        });
+      } catch (e) {
+        // Fallback
+        new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
       }
-
-    } catch (error) {
-      console.error('Failed to play notification tone:', error);
     }
   };
 
@@ -394,7 +355,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
           restTimerRef.current = setTimeout(tick, 200);
         } else {
           setRestTimeRemaining(0);
-          playRestCompletedTone();
+          triggerRestCompletedNotification();
           setShowRestTimer(false);
           restEndTimeRef.current = null;
           if (silentAudioRef.current) silentAudioRef.current.pause();
@@ -412,13 +373,6 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const startRestTimer = (secs: number = 90) => {
     try {
-      if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioCtx) audioCtxRef.current = new AudioCtx();
-      }
-      if (audioCtxRef.current?.state === 'suspended') {
-        audioCtxRef.current.resume();
-      }
       if (silentAudioRef.current) {
         silentAudioRef.current.play().catch(() => {});
       }
