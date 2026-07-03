@@ -5,7 +5,7 @@ import { FoodItem } from '../types';
 import { fetchFoodMacros } from '../utils/gemini';
 
 export default function CreateFoodModal() {
-  const { showCreateFoodModal, setShowCreateFoodModal, setShowAddFoodModal, handleAddFood } = useNutrition();
+  const { showCreateFoodModal, setShowCreateFoodModal, setShowAddFoodModal, handleAddFood, editingFood, setEditingFood } = useNutrition();
 
   const [name, setName] = useState('');
   const [servingAmount, setServingAmount] = useState('');
@@ -26,17 +26,29 @@ export default function CreateFoodModal() {
   // Reset form when modal opens
   useEffect(() => {
     if (showCreateFoodModal) {
-      setName('');
-      setServingAmount('');
-      setServingUnit('grams');
-      setCalories('');
-      setProtein('');
-      setCarbs('');
-      setFat('');
-      setMacrosGenerated(false);
+      if (editingFood) {
+        setName(editingFood.name);
+        const [amt, ...unitParts] = editingFood.servingSize.split(' ');
+        setServingAmount(amt);
+        setServingUnit(unitParts.join(' ') || 'grams');
+        setCalories(String(editingFood.calories));
+        setProtein(String(editingFood.protein));
+        setCarbs(String(editingFood.carbs));
+        setFat(String(editingFood.fat));
+        setMacrosGenerated(true);
+      } else {
+        setName('');
+        setServingAmount('');
+        setServingUnit('grams');
+        setCalories('');
+        setProtein('');
+        setCarbs('');
+        setFat('');
+        setMacrosGenerated(false);
+      }
       setIsGenerating(false);
     }
-  }, [showCreateFoodModal]);
+  }, [showCreateFoodModal, editingFood]);
 
   if (!showCreateFoodModal) return null;
 
@@ -66,7 +78,7 @@ export default function CreateFoodModal() {
     if (!name || !servingAmount || !macrosGenerated) return;
 
     const newFood: FoodItem = {
-      id: 'f' + Date.now(),
+      id: editingFood ? editingFood.id : ('f' + Date.now()),
       name: name.trim(),
       calories: parseFloat(calories),
       protein: parseFloat(protein),
@@ -78,11 +90,13 @@ export default function CreateFoodModal() {
     await handleAddFood(newFood);
     
     // Close this and reopen AddFood
+    setEditingFood(null);
     setShowCreateFoodModal(false);
     setShowAddFoodModal(true);
   };
 
   const closeModal = () => {
+    setEditingFood(null);
     setShowCreateFoodModal(false);
     setShowAddFoodModal(true);
   };
@@ -99,7 +113,7 @@ export default function CreateFoodModal() {
         {/* Header */}
         <div className="p-4 border-b border-neutral-900 flex justify-between items-center">
           <div>
-            <h3 className="text-base font-extrabold text-neutral-100">Create Food</h3>
+            <h3 className="text-base font-extrabold text-neutral-100">{editingFood ? 'Edit Custom Food' : 'Create Food'}</h3>
             <p className="text-xs text-neutral-500 mt-0.5">Use AI to automatically fetch nutritional data.</p>
           </div>
           <button onClick={closeModal} className="text-neutral-500 hover:text-neutral-300 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer">

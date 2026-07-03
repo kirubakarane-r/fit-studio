@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search, Plus, Trash2 } from 'lucide-react';
+import { X, Search, Plus, Trash2, Edit2, Check } from 'lucide-react';
 import { useNutrition } from '../context/NutritionContext';
 import { FoodItem } from '../types';
 
@@ -8,11 +8,12 @@ export default function AddFoodModal() {
     showAddFoodModal, setShowAddFoodModal, 
     setShowCreateFoodModal, 
     foods, activeMealType, 
-    handleAddMealEntry, selectedDate, handleDeleteFood
+    handleAddMealEntry, selectedDate, handleDeleteFood,
+    setEditingFood
   } = useNutrition();
   
   const [search, setSearch] = useState('');
-  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
+  const [selectedFoodIds, setSelectedFoodIds] = useState<Set<string>>(new Set());
   const [foodToDelete, setFoodToDelete] = useState<FoodItem | null>(null);
   const [servings, setServings] = useState('1');
 
@@ -21,27 +22,33 @@ export default function AddFoodModal() {
   const filteredFoods = foods.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleAdd = async () => {
-    if (!selectedFood) return;
+    if (selectedFoodIds.size === 0) return;
     const s = parseFloat(servings) || 1;
-    await handleAddMealEntry({
-      foodId: selectedFood.id,
-      foodName: selectedFood.name,
-      calories: selectedFood.calories * s,
-      protein: selectedFood.protein * s,
-      carbs: selectedFood.carbs * s,
-      fat: selectedFood.fat * s,
-      servings: s,
-      mealType: activeMealType,
-      date: selectedDate
-    });
-    setSelectedFood(null);
+    
+    const foodsToAdd = foods.filter(f => selectedFoodIds.has(f.id));
+    
+    await Promise.all(foodsToAdd.map(food => 
+      handleAddMealEntry({
+        foodId: food.id,
+        foodName: food.name,
+        calories: food.calories * s,
+        protein: food.protein * s,
+        carbs: food.carbs * s,
+        fat: food.fat * s,
+        servings: s,
+        mealType: activeMealType,
+        date: selectedDate
+      })
+    ));
+    
+    setSelectedFoodIds(new Set());
     setSearch('');
     setServings('1');
     setShowAddFoodModal(false);
   };
 
   const closeModal = () => {
-    setSelectedFood(null);
+    setSelectedFoodIds(new Set());
     setSearch('');
     setShowAddFoodModal(false);
   };
@@ -94,19 +101,31 @@ export default function AddFoodModal() {
             <div className="space-y-2 mt-4 pb-4">
               <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Your Foods</h4>
               {filteredFoods.length > 0 ? (
-                filteredFoods.map(food => (
+                filteredFoods.map(food => {
+                  const isSelected = selectedFoodIds.has(food.id);
+                  return (
                   <div key={food.id} className="relative group flex items-center gap-2">
                     <button
-                      onClick={() => setSelectedFood(food)}
+                      onClick={() => {
+                        const newSet = new Set(selectedFoodIds);
+                        if (isSelected) newSet.delete(food.id);
+                        else newSet.add(food.id);
+                        setSelectedFoodIds(newSet);
+                      }}
                       className={`flex-1 text-left bg-neutral-900/30 hover:bg-neutral-900 border rounded-xl p-3 transition-colors flex justify-between items-center cursor-pointer ${
-                        selectedFood?.id === food.id 
+                        isSelected 
                           ? 'border-emerald-500/50 bg-emerald-500/5' 
                           : 'border-neutral-800/80 hover:border-neutral-700'
                       }`}
                     >
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-neutral-200">{food.name}</span>
-                        <span className="text-xs text-neutral-500 mt-0.5">{food.servingSize}</span>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors shrink-0 ${isSelected ? 'bg-emerald-500 border-emerald-500' : 'bg-neutral-800/50 border-neutral-700'}`}>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-black" />}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-neutral-200">{food.name}</span>
+                          <span className="text-xs text-neutral-500 mt-0.5">{food.servingSize}</span>
+                        </div>
                       </div>
                       <div className="text-right">
                         <span className="block text-sm font-bold text-emerald-400">{Math.round(food.calories)} kcal</span>
@@ -115,21 +134,35 @@ export default function AddFoodModal() {
                         </span>
                       </div>
                     </button>
-                    {/* Delete Custom Food Button */}
+                    {/* Action Buttons for Custom Foods */}
                     {food.id.startsWith('f') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFoodToDelete(food);
-                        }}
-                        className="p-3 text-neutral-600 hover:text-red-400 hover:bg-neutral-900 rounded-xl transition-colors cursor-pointer shrink-0"
-                        title="Delete Food"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex flex-col gap-1 shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingFood(food);
+                            setShowAddFoodModal(false);
+                            setShowCreateFoodModal(true);
+                          }}
+                          className="p-1.5 text-neutral-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                          title="Edit Food"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFoodToDelete(food);
+                          }}
+                          className="p-1.5 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                          title="Delete Food"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                   </div>
-                ))
+                )})
               ) : (
                 <p className="text-sm text-neutral-500 text-center py-8">
                   No foods found. Create a custom food to get started!
@@ -149,17 +182,17 @@ export default function AddFoodModal() {
               step="0.1"
               value={servings}
               onChange={(e) => setServings(e.target.value)}
-              disabled={!selectedFood}
+              disabled={selectedFoodIds.size === 0}
               className="w-16 bg-neutral-900 border border-neutral-800 focus:border-emerald-500 text-sm rounded-lg px-2 py-2.5 text-center text-white disabled:opacity-50 transition-colors focus:outline-none"
             />
           </div>
           <div className="flex-1">
             <button
               onClick={handleAdd}
-              disabled={!selectedFood}
+              disabled={selectedFoodIds.size === 0}
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-neutral-800 disabled:text-neutral-500 text-black text-sm font-bold rounded-xl transition-all flex items-center justify-center cursor-pointer"
             >
-              Add to Diary
+              Add {selectedFoodIds.size > 0 ? selectedFoodIds.size : ''} to Diary
             </button>
           </div>
         </div>
@@ -184,7 +217,11 @@ export default function AddFoodModal() {
               <button
                 onClick={() => {
                   handleDeleteFood(foodToDelete.id);
-                  if (selectedFood?.id === foodToDelete.id) setSelectedFood(null);
+                  if (selectedFoodIds.has(foodToDelete.id)) {
+                    const newSet = new Set(selectedFoodIds);
+                    newSet.delete(foodToDelete.id);
+                    setSelectedFoodIds(newSet);
+                  }
                   setFoodToDelete(null);
                 }}
                 className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 text-sm font-bold rounded-xl transition-colors cursor-pointer"

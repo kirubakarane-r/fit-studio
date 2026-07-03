@@ -48,7 +48,8 @@ export default function ProgressScreen() {
       workoutsCount: weekWorkouts.length,
       volume: totalVolume,
       sets: completedSetsCount,
-      dateRange: `${formatStr(weekStart)} - ${formatStr(weekEndDisplay)}`
+      dateRange: `${formatStr(weekStart)} - ${formatStr(weekEndDisplay)}`,
+      weekWorkouts
     };
   };
 
@@ -143,7 +144,7 @@ export default function ProgressScreen() {
           Fragment,
           null,
           weekStatsContent,
-          createElement(MuscleDistributionChart, { workouts, exercises }),
+          createElement(MuscleDistributionChart, { workouts: weekStats.weekWorkouts, exercises }),
           
           createElement(
             'div',
