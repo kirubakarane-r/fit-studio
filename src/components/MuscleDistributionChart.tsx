@@ -8,30 +8,22 @@ interface MuscleDistributionChartProps {
 
 export default function MuscleDistributionChart({ workouts, exercises }: MuscleDistributionChartProps) {
   const { distribution, totalSets } = useMemo(() => {
-    // Only look at the last 30 days for distribution
-    const now = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(now.getDate() - 30);
-
     const muscleCounts: Record<string, number> = {};
     let total = 0;
 
     workouts.forEach(w => {
-      const wDate = new Date(w.date);
-      if (wDate >= thirtyDaysAgo) {
-        w.exercises.forEach(exInWorkout => {
-          const exData = exercises.find(e => e.id === exInWorkout.id);
-          if (exData) {
-            const muscle = exData.muscle;
-            exInWorkout.sets.forEach(s => {
-              if (s.done) {
-                muscleCounts[muscle] = (muscleCounts[muscle] || 0) + 1;
-                total++;
-              }
-            });
-          }
-        });
-      }
+      w.exercises.forEach(exInWorkout => {
+        const exData = exercises.find(e => e.id === exInWorkout.id);
+        if (exData) {
+          const muscle = exData.muscle;
+          exInWorkout.sets.forEach(s => {
+            if (s.done) {
+              muscleCounts[muscle] = (muscleCounts[muscle] || 0) + 1;
+              total++;
+            }
+          });
+        }
+      });
     });
 
     const dist = Object.keys(muscleCounts).map(muscle => {
@@ -74,7 +66,7 @@ export default function MuscleDistributionChart({ workouts, exercises }: MuscleD
         'div',
         null,
         createElement('h3', { className: 'text-lg font-extrabold text-neutral-100 tracking-tight' }, 'Muscle Focus'),
-        createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Sets performed in the last 30 days')
+        createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Sets performed in selected week')
       )
     ),
 
