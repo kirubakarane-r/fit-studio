@@ -61,7 +61,7 @@ export default function ProgressScreen() {
       'div',
       { className: 'flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl' },
       createElement('button', { onClick: () => setWeekOffset(prev => prev - 1), className: 'p-2 hover:bg-neutral-800 rounded-lg cursor-pointer' }, createElement(ChevronLeft, { className: 'w-5 h-5 text-neutral-400' })),
-      createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'This Week' : weekStats.dateRange),
+      createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'Current Week' : weekStats.dateRange),
       createElement('button', { onClick: () => setWeekOffset(prev => prev + 1), disabled: weekOffset >= 0, className: `p-2 rounded-lg ${weekOffset >= 0 ? 'opacity-50' : 'hover:bg-neutral-800 cursor-pointer'}` }, createElement(ChevronRight, { className: 'w-5 h-5 text-neutral-400' }))
     ),
     createElement(

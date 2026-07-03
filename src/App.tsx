@@ -2,7 +2,7 @@ import React from 'react';
 import { Dumbbell, Clock } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WorkoutProvider, useWorkout } from './context/WorkoutContext';
-import { NutritionProvider } from './context/NutritionContext';
+import { NutritionProvider, useNutrition } from './context/NutritionContext';
 
 // Screen Components (consume useWorkout)
 import HomeScreen from './components/HomeScreen';
@@ -32,8 +32,41 @@ import UpdateBanner from './components/UpdateBanner';
 
 function WorkoutApp() {
   const { user, loading: authLoading, profile } = useAuth();
-  const { screen, navigateTo, activeWorkout, loading: dataLoading } = useWorkout();
+  const {
+    screen, navigateTo, activeWorkout, loading: dataLoading,
+    showNewWorkoutModal, showAddExerciseModal, showCreateLibraryModal,
+    showCreatePlanModal, selectedWorkoutId, showFinishConfirm,
+    showRestPrompt, selectedTemplateToView
+  } = useWorkout();
+  const { showAddFoodModal, showCreateFoodModal, showEditTargetModal } = useNutrition();
   const [showProfileModal, setShowProfileModal] = React.useState(false);
+
+  React.useEffect(() => {
+    const isModalOpen = 
+      showProfileModal ||
+      showNewWorkoutModal ||
+      showAddExerciseModal ||
+      showCreateLibraryModal ||
+      showCreatePlanModal ||
+      showRestPrompt ||
+      !!selectedTemplateToView ||
+      !!selectedWorkoutId ||
+      showFinishConfirm ||
+      showAddFoodModal ||
+      showCreateFoodModal ||
+      showEditTargetModal;
+
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [
+    showProfileModal, showNewWorkoutModal, showAddExerciseModal, showCreateLibraryModal,
+    showCreatePlanModal, showRestPrompt, selectedTemplateToView, selectedWorkoutId,
+    showFinishConfirm, showAddFoodModal, showCreateFoodModal, showEditTargetModal
+  ]);
 
   // If Auth state is resolving, show full screen loading
   if (authLoading) {
