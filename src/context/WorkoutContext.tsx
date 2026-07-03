@@ -295,7 +295,16 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [restTimeRemaining, setRestTimeRemaining] = useState<number>(0);
   const [showRestTimer, setShowRestTimer] = useState<boolean>(false);
   const restTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const restEndTimeRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | any>(null);
+  const silentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize silent audio for background execution
+  useEffect(() => {
+    const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+    audio.loop = true;
+    silentAudioRef.current = audio;
+  }, []);
 
   // Active workout duration ticker
   useEffect(() => {
@@ -354,19 +363,30 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Rest timer ticker
   useEffect(() => {
     if (showRestTimer) {
-      if (restTimeRemaining > 0) {
-        restTimerRef.current = setTimeout(() => {
-          setRestTimeRemaining(prev => prev - 1);
-        }, 1000);
-      } else {
-        playRestCompletedTone();
-        setShowRestTimer(false);
-      }
+      const tick = () => {
+        if (!restEndTimeRef.current) return;
+        const remaining = Math.ceil((restEndTimeRef.current - Date.now()) / 1000);
+        
+        if (remaining > 0) {
+          setRestTimeRemaining(remaining);
+          restTimerRef.current = setTimeout(tick, 200);
+        } else {
+          setRestTimeRemaining(0);
+          playRestCompletedTone();
+          setShowRestTimer(false);
+          restEndTimeRef.current = null;
+          if (silentAudioRef.current) silentAudioRef.current.pause();
+        }
+      };
+      
+      // Start the tick loop
+      restTimerRef.current = setTimeout(tick, 200);
     }
+    
     return () => {
       if (restTimerRef.current) clearTimeout(restTimerRef.current);
     };
-  }, [showRestTimer, restTimeRemaining]);
+  }, [showRestTimer]);
 
   const startRestTimer = (secs: number = 90) => {
     try {
@@ -377,8 +397,12 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (audioCtxRef.current?.state === 'suspended') {
         audioCtxRef.current.resume();
       }
+      if (silentAudioRef.current) {
+        silentAudioRef.current.play().catch(() => {});
+      }
     } catch (e) {}
     
+    restEndTimeRef.current = Date.now() + secs * 1000;
     setRestTimeRemaining(secs);
     setShowRestTimer(true);
   };
@@ -386,6 +410,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const skipRestTimer = () => {
     setRestTimeRemaining(0);
     setShowRestTimer(false);
+    if (silentAudioRef.current) silentAudioRef.current.pause();
   };
 
   // --------------------------------------------------
