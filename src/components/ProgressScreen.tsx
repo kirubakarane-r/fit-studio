@@ -1,10 +1,12 @@
-import { createElement, Fragment } from 'react';
-import { TrendingUp } from 'lucide-react';
-import { formatDateShort } from '../utils/formatters';
+import { createElement, Fragment, useState } from 'react';
+import { TrendingUp, Medal, Calendar } from 'lucide-react';
+import MuscleDistributionChart from './MuscleDistributionChart';
 import { useWorkout } from '../context/WorkoutContext';
+import { formatDateShort } from '../utils/formatters';
 
 export default function ProgressScreen() {
   const { workouts, exercises, personalRecords } = useWorkout();
+  const [activeTab, setActiveTab] = useState<string>('');
 
   const content = workouts.length === 0
     ? createElement(
@@ -23,74 +25,119 @@ export default function ProgressScreen() {
         )
       )
     : (() => {
+        // Group PRs by muscle
         const groupedRecords = personalRecords.reduce((acc, pr) => {
-          if (!acc[pr.muscle]) acc[pr.muscle] = [];
-          acc[pr.muscle].push(pr);
+          const muscle = pr.muscle || 'other';
+          if (!acc[muscle]) acc[muscle] = [];
+          acc[muscle].push(pr);
           return acc;
         }, {} as Record<string, typeof personalRecords>);
+
+        // Sort muscles alphabetically
+        const sortedMuscles = Object.keys(groupedRecords).sort();
+
+        // Color mapping for muscle groups
+        const colorMap: Record<string, string> = {
+          chest: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+          back: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+          legs: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+          shoulders: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+          arms: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
+          core: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20',
+          cardio: 'text-orange-400 bg-orange-400/10 border-orange-400/20'
+        };
+
+        const getMuscleStyle = (muscle: string) => {
+          return colorMap[muscle.toLowerCase()] || 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
+        };
+
+        const currentTab = activeTab || sortedMuscles[0];
 
         return createElement(
           Fragment,
           null,
-          // Personal Records section
+          createElement(MuscleDistributionChart, { workouts, exercises }),
+          
           createElement(
             'div',
-            { className: 'space-y-6' },
+            { className: 'mt-8' },
+            createElement(
+              'div',
+              { className: 'flex items-center gap-2 mb-6' },
+              createElement(Medal, { className: 'w-5 h-5 text-emerald-400' }),
+              createElement('h3', { className: 'text-lg font-extrabold text-neutral-100 tracking-tight' }, 'Personal Records')
+            ),
+            
             Object.keys(groupedRecords).length === 0
               ? createElement(
                   'div',
-                  { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-5 text-center text-xs text-neutral-500' },
-                  'No exercise logs with valid weights and reps found to calculate PR.'
+                  { className: 'text-center py-8 border border-dashed border-neutral-800/50 rounded-2xl bg-neutral-900/30' },
+                  createElement('span', { className: 'text-sm font-medium text-neutral-500' }, 'No personal records established yet.')
                 )
-              : Object.entries(groupedRecords).map(([muscle, prs]) =>
+              : createElement(
+                  'div',
+                  { className: 'space-y-6' },
+                  // Tabs row
                   createElement(
                     'div',
-                    { key: muscle, className: 'space-y-3' },
-                    createElement(
-                      'div',
-                      { className: 'flex justify-between items-center' },
-                      createElement(
-                        'h3',
-                        { className: 'text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2' },
-                        createElement('span', { className: `w-2 h-2 rounded-full bg-emerald-500` }),
+                    { className: 'flex gap-2 overflow-x-auto pb-2 scrollbar-hide' },
+                    sortedMuscles.map(muscle => {
+                      const isActive = currentTab === muscle;
+                      const muscleStyle = getMuscleStyle(muscle);
+                      const tabClass = isActive 
+                        ? muscleStyle 
+                        : 'text-neutral-400 bg-neutral-900/50 border-neutral-800/50 hover:bg-neutral-800';
+                      
+                      return createElement(
+                        'button',
+                        { 
+                          key: muscle,
+                          className: `whitespace-nowrap px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-widest cursor-pointer transition-all outline-none ${tabClass}`,
+                          onClick: () => setActiveTab(muscle)
+                        },
                         muscle
-                      )
-                    ),
-                    createElement(
-                      'div',
-                      { className: 'space-y-2' },
-                      prs.map((pr, index) => {
-                        let prValue = '';
-                        if (pr.type === 'weight') {
-                          prValue = `${pr.weight}kg × ${pr.reps}`;
-                        } else if (pr.type === 'bodyweight') {
-                          prValue = `${pr.reps} reps`;
-                        } else if (pr.type === 'cardio') {
-                          prValue = `${pr.weight}m ${pr.reps > 0 ? `${pr.reps}km` : ''}`;
-                        }
-                        
-                        return createElement(
+                      );
+                    })
+                  ),
+                  // Content grid for active tab
+                  createElement(
+                    'div',
+                    { className: 'grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4' },
+                    (groupedRecords[currentTab] || []).map((pr, index) => {
+                      let prValue = '';
+                      if (pr.type === 'weight') {
+                        prValue = `${pr.weight}kg × ${pr.reps}`;
+                      } else if (pr.type === 'bodyweight') {
+                        prValue = `${pr.reps} reps`;
+                      } else if (pr.type === 'cardio') {
+                        prValue = `${pr.weight}m ${pr.reps > 0 ? `${pr.reps}km` : ''}`;
+                      }
+
+                      return createElement(
+                        'div',
+                        { key: index, className: 'bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-4 shadow-xl flex flex-col hover:border-emerald-500/50 transition-colors group' },
+                        createElement(
                           'div',
-                          { key: index, className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex justify-between items-center' },
+                          { className: 'flex justify-between items-start mb-2' },
+                          createElement('div', { className: 'font-bold text-sm text-neutral-200 group-hover:text-emerald-400 transition-colors' }, pr.exerciseName)
+                        ),
+                        createElement(
+                          'div',
+                          { className: 'flex items-end justify-between mt-auto pt-2' },
                           createElement(
                             'div',
-                            null,
-                            createElement('h4', { className: 'font-bold text-sm text-neutral-200' }, pr.exerciseName),
-                            createElement(
-                              'div',
-                              { className: 'flex items-center gap-1.5 text-xs text-neutral-500 mt-1' },
-                              createElement('span', null, formatDateShort(pr.date))
-                            )
+                            { className: 'flex items-center gap-1.5 text-xs text-neutral-500 font-medium' },
+                            createElement(Calendar, { className: 'w-3.5 h-3.5' }),
+                            formatDateShort(pr.date)
                           ),
                           createElement(
                             'div',
-                            { className: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl px-3.5 py-2 font-mono text-center min-w-[80px]' },
-                            createElement('div', { className: 'text-[10px] text-neutral-500 uppercase tracking-wider' }, 'PR'),
-                            createElement('div', { className: 'text-sm font-extrabold whitespace-nowrap mt-0.5' }, prValue)
+                            { className: 'text-base font-extrabold text-neutral-100 tracking-tight' },
+                            prValue
                           )
-                        );
-                      })
-                    )
+                        )
+                      );
+                    })
                   )
                 )
           )
@@ -99,7 +146,7 @@ export default function ProgressScreen() {
 
   return createElement(
     'div',
-    { className: 'space-y-6' },
+    { className: 'space-y-6 pb-20' },
     createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Metrics & Analytics'),
     content
   );
