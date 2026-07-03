@@ -1,4 +1,4 @@
-import { createElement, Fragment } from 'react';
+import { createElement, Fragment, useState } from 'react';
 import { TrendingUp, Medal, Calendar } from 'lucide-react';
 import MuscleDistributionChart from './MuscleDistributionChart';
 import { useWorkout } from '../context/WorkoutContext';
@@ -6,6 +6,7 @@ import { formatDateShort } from '../utils/formatters';
 
 export default function ProgressScreen() {
   const { workouts, exercises, personalRecords } = useWorkout();
+  const [activeTab, setActiveTab] = useState<string>('');
 
   const content = workouts.length === 0
     ? createElement(
@@ -50,6 +51,8 @@ export default function ProgressScreen() {
           return colorMap[muscle.toLowerCase()] || 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
         };
 
+        const currentTab = activeTab || sortedMuscles[0];
+
         return createElement(
           Fragment,
           null,
@@ -74,64 +77,68 @@ export default function ProgressScreen() {
               : createElement(
                   'div',
                   { className: 'space-y-6' },
-                  sortedMuscles.map(muscle => {
-                    const prs = groupedRecords[muscle];
-                    const muscleStyle = getMuscleStyle(muscle);
-                    
-                    return createElement(
-                      'div',
-                      { key: muscle, className: 'space-y-4' },
-                      createElement(
-                        'h4',
-                        { className: `inline-flex items-center px-3 py-1 rounded-lg border text-xs font-black uppercase tracking-widest ${muscleStyle}` },
+                  // Tabs row
+                  createElement(
+                    'div',
+                    { className: 'flex gap-2 overflow-x-auto pb-2 scrollbar-hide' },
+                    sortedMuscles.map(muscle => {
+                      const isActive = currentTab === muscle;
+                      const muscleStyle = getMuscleStyle(muscle);
+                      const tabClass = isActive 
+                        ? muscleStyle 
+                        : 'text-neutral-400 bg-neutral-900/50 border-neutral-800/50 hover:bg-neutral-800';
+                      
+                      return createElement(
+                        'button',
+                        { 
+                          key: muscle,
+                          className: `whitespace-nowrap px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-widest cursor-pointer transition-all outline-none ${tabClass}`,
+                          onClick: () => setActiveTab(muscle)
+                        },
                         muscle
-                      ),
-                      createElement(
-                        'div',
-                        { className: 'grid grid-cols-1 sm:grid-cols-2 gap-3' },
-                        prs.map((pr, index) => {
-                          let prValue = '';
-                          if (pr.type === 'weight') {
-                            prValue = `${pr.weight}kg × ${pr.reps}`;
-                          } else if (pr.type === 'bodyweight') {
-                            prValue = `${pr.reps} reps`;
-                          } else if (pr.type === 'cardio') {
-                            prValue = `${pr.weight}m ${pr.reps > 0 ? `${pr.reps}km` : ''}`;
-                          }
+                      );
+                    })
+                  ),
+                  // Content grid for active tab
+                  createElement(
+                    'div',
+                    { className: 'grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4' },
+                    (groupedRecords[currentTab] || []).map((pr, index) => {
+                      let prValue = '';
+                      if (pr.type === 'weight') {
+                        prValue = `${pr.weight}kg × ${pr.reps}`;
+                      } else if (pr.type === 'bodyweight') {
+                        prValue = `${pr.reps} reps`;
+                      } else if (pr.type === 'cardio') {
+                        prValue = `${pr.weight}m ${pr.reps > 0 ? `${pr.reps}km` : ''}`;
+                      }
 
-                          return createElement(
+                      return createElement(
+                        'div',
+                        { key: index, className: 'bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-4 shadow-xl flex flex-col hover:border-emerald-500/50 transition-colors group' },
+                        createElement(
+                          'div',
+                          { className: 'flex justify-between items-start mb-2' },
+                          createElement('div', { className: 'font-bold text-sm text-neutral-200 group-hover:text-emerald-400 transition-colors' }, pr.exerciseName)
+                        ),
+                        createElement(
+                          'div',
+                          { className: 'flex items-end justify-between mt-auto pt-2' },
+                          createElement(
                             'div',
-                            { key: index, className: 'bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-4 shadow-xl flex flex-col hover:border-emerald-500/50 transition-colors group' },
-                            createElement(
-                              'div',
-                              { className: 'flex justify-between items-start mb-2' },
-                              createElement('div', { className: 'font-bold text-sm text-neutral-200 group-hover:text-emerald-400 transition-colors' }, pr.exerciseName),
-                              createElement(
-                                'div',
-                                { className: 'bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider' },
-                                'PR'
-                              )
-                            ),
-                            createElement(
-                              'div',
-                              { className: 'flex items-end justify-between mt-auto pt-2' },
-                              createElement(
-                                'div',
-                                { className: 'flex items-center gap-1.5 text-xs text-neutral-500 font-medium' },
-                                createElement(Calendar, { className: 'w-3.5 h-3.5' }),
-                                formatDateShort(pr.date)
-                              ),
-                              createElement(
-                                'div',
-                                { className: 'text-base font-extrabold text-neutral-100 tracking-tight' },
-                                prValue
-                              )
-                            )
-                          );
-                        })
-                      )
-                    );
-                  })
+                            { className: 'flex items-center gap-1.5 text-xs text-neutral-500 font-medium' },
+                            createElement(Calendar, { className: 'w-3.5 h-3.5' }),
+                            formatDateShort(pr.date)
+                          ),
+                          createElement(
+                            'div',
+                            { className: 'text-base font-extrabold text-neutral-100 tracking-tight' },
+                            prValue
+                          )
+                        )
+                      );
+                    })
+                  )
                 )
           )
         );
