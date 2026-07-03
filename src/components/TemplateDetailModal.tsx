@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { X, Play } from 'lucide-react';
+import { X, Play, Pencil } from 'lucide-react';
 import { useWorkout } from '../context/WorkoutContext';
 
 export default function TemplateDetailModal() {
@@ -7,7 +7,9 @@ export default function TemplateDetailModal() {
     selectedTemplateToView,
     setSelectedTemplateToView,
     exercises,
-    handleStartWorkoutFromTemplate
+    handleStartWorkoutFromTemplate,
+    setEditingTemplate,
+    setShowCreatePlanModal
   } = useWorkout();
 
   if (!selectedTemplateToView) return null;
@@ -42,12 +44,28 @@ export default function TemplateDetailModal() {
           createElement('p', { className: 'text-xs text-neutral-500 mt-0.5' }, `${tplExercises.length} movements in this plan`)
         ),
         createElement(
-          'button',
-          {
-            onClick: () => setSelectedTemplateToView(null),
-            className: 'text-neutral-500 hover:text-neutral-300 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer transition-colors'
-          },
-          createElement(X, { className: 'w-4 h-4' })
+          'div',
+          { className: 'flex items-center gap-2' },
+          createElement(
+            'button',
+            {
+              onClick: () => {
+                setEditingTemplate(selectedTemplateToView);
+                setShowCreatePlanModal(true);
+                setSelectedTemplateToView(null);
+              },
+              className: 'text-neutral-500 hover:text-emerald-400 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer transition-colors'
+            },
+            createElement(Pencil, { className: 'w-4 h-4' })
+          ),
+          createElement(
+            'button',
+            {
+              onClick: () => setSelectedTemplateToView(null),
+              className: 'text-neutral-500 hover:text-neutral-300 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer transition-colors'
+            },
+            createElement(X, { className: 'w-4 h-4' })
+          )
         )
       ),
 
