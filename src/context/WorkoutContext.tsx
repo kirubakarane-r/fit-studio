@@ -364,7 +364,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
               reg.showNotification('Rest Time is Over!', {
                 body: 'Time for your next set!',
                 vibrate: [200, 100, 200]
-              });
+              } as any);
             } else {
               new Notification('Rest Time is Over!', { body: 'Time for your next set!' });
             }
