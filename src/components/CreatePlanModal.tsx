@@ -95,7 +95,7 @@ export default function CreatePlanModal() {
       { className: 'bg-[#161618] border-t sm:border border-neutral-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[95vh] flex flex-col shadow-2xl overflow-hidden' },
       
       // Handle bar on mobile
-      createElement('div', { className: 'w-12 h-1 bg-neutral-800 rounded-full mx-auto mt-3 mb-1 sm:hidden' }),
+      createElement('div', { className: 'shrink-0 w-12 h-1 bg-neutral-800 rounded-full mx-auto mt-3 mb-1 sm:hidden' }),
 
       // Header
       createElement(
