@@ -22,6 +22,8 @@ export interface NutritionContextType {
   setShowEditTargetModal: React.Dispatch<React.SetStateAction<boolean>>;
   activeMealType: 'breakfast' | 'lunch' | 'dinner' | 'snacks' | null;
   setActiveMealType: React.Dispatch<React.SetStateAction<'breakfast' | 'lunch' | 'dinner' | 'snacks' | null>>;
+  editingFood: FoodItem | null;
+  setEditingFood: React.Dispatch<React.SetStateAction<FoodItem | null>>;
   
   handleAddFood: (food: FoodItem) => Promise<void>;
   handleDeleteFood: (id: string) => Promise<void>;
@@ -61,6 +63,7 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [showCreateFoodModal, setShowCreateFoodModal] = useState(false);
   const [showEditTargetModal, setShowEditTargetModal] = useState(false);
   const [activeMealType, setActiveMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snacks' | null>(null);
+  const [editingFood, setEditingFood] = useState<FoodItem | null>(null);
 
   // Sync Foods
   useEffect(() => {
@@ -183,6 +186,7 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       showAddFoodModal, setShowAddFoodModal, showCreateFoodModal, setShowCreateFoodModal,
       showEditTargetModal, setShowEditTargetModal,
       activeMealType, setActiveMealType,
+      editingFood, setEditingFood,
       handleAddFood, handleDeleteFood, handleAddMealEntry, handleUpdateMealEntry, handleDeleteMealEntry, handleUpdateTarget
     }}>
       {children}
