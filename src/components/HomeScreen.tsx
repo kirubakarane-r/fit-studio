@@ -149,7 +149,7 @@ export default function HomeScreen() {
       createElement(
         'div',
         { className: 'flex justify-between items-center' },
-        createElement('h3', { className: 'text-sm font-bold text-neutral-300 uppercase tracking-wider' }, 'Workout Plans'),
+        createElement('h3', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Workout Plans'),
         createElement(
           'button',
           {

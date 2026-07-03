@@ -159,7 +159,8 @@ export default function NutritionScreen() {
   const remainingCals = target.calories - totals.calories;
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-4 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h2 className="text-base font-extrabold text-neutral-200 uppercase tracking-wider">Nutrition Log</h2>
       {/* Date Navigation */}
       <div className="flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl">
         <button onClick={handlePrevDay} className="p-2 hover:bg-neutral-800 rounded-lg cursor-pointer">
@@ -189,13 +190,13 @@ export default function NutritionScreen() {
           </button>
         </div>
         
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex flex-col items-center">
+        <div className="grid grid-cols-3 items-center mb-8">
+          <div className="flex flex-col items-center justify-center">
             <span className="text-2xl font-black text-neutral-100">{Math.round(totals.calories)}</span>
             <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Eaten</span>
           </div>
           
-          <div className="relative w-32 h-32 flex flex-col items-center justify-center">
+          <div className="relative w-32 h-32 flex flex-col items-center justify-center mx-auto">
             <svg className="w-full h-full transform -rotate-90 absolute" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-neutral-800" />
               <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * calPercentage) / 100} className="text-emerald-500 transition-all duration-1000" />
@@ -206,7 +207,7 @@ export default function NutritionScreen() {
             </div>
           </div>
           
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             <span className="text-2xl font-black text-neutral-100">{target.calories}</span>
             <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Goal</span>
           </div>
