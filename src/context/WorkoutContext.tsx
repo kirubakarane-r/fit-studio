@@ -310,38 +310,37 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => clearInterval(ticker);
   }, [activeWorkout]);
 
-  // Play a premium synth double-beep on rest completion
+  // Play an arcade "level up" style success sound on rest completion
   const playRestCompletedTone = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
-      gain1.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-      osc1.start(ctx.currentTime);
-      osc1.stop(ctx.currentTime + 0.15);
+      const playNote = (freq: number, startTime: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'square'; // 'square' gives it that arcade 8-bit feel
+        
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+        
+        // Quick attack and release for that plucky arcade sound
+        gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.02);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + startTime + duration);
+        
+        osc.start(ctx.currentTime + startTime);
+        osc.stop(ctx.currentTime + startTime + duration);
+      };
+
+      // Play a fast ascending major arpeggio
+      playNote(392.00, 0.0, 0.1);    // G4
+      playNote(523.25, 0.1, 0.1);    // C5
+      playNote(659.25, 0.2, 0.1);    // E5
+      playNote(783.99, 0.3, 0.3);    // G5 (held longer)
       
-      setTimeout(() => {
-        try {
-          const osc2 = ctx.createOscillator();
-          const gain2 = ctx.createGain();
-          osc2.connect(gain2);
-          gain2.connect(ctx.destination);
-          osc2.type = 'sine';
-          osc2.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
-          gain2.gain.setValueAtTime(0.15, ctx.currentTime);
-          gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-          osc2.start(ctx.currentTime);
-          osc2.stop(ctx.currentTime + 0.25);
-        } catch {}
-      }, 180);
     } catch (error) {
       console.error('Failed to play notification tone:', error);
     }
