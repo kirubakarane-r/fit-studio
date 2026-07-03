@@ -321,6 +321,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Show a native system notification on rest completion
   const triggerRestCompletedNotification = () => {
+    // Only show the system push notification if the app is in the background or screen is locked
+    if (document.visibilityState === 'visible') return;
+
     if ('Notification' in window && Notification.permission === 'granted') {
       try {
         // Attempt Service Worker notification first (required for some mobile browsers)
