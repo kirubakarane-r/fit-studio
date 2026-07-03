@@ -12,8 +12,7 @@ export default function RestTimer() {
     { className: 'fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300' },
     // Backdrop
     createElement('div', { 
-      className: 'absolute inset-0 bg-black/60 backdrop-blur-sm',
-      onClick: skipRestTimer // optional: click backdrop to skip
+      className: 'absolute inset-0 bg-black/60 backdrop-blur-sm'
     }),
     
     // Modal Content

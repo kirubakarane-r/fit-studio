@@ -295,6 +295,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [restTimeRemaining, setRestTimeRemaining] = useState<number>(0);
   const [showRestTimer, setShowRestTimer] = useState<boolean>(false);
   const restTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioCtxRef = useRef<AudioContext | any>(null);
 
   // Active workout duration ticker
   useEffect(() => {
@@ -313,9 +314,13 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Play an arcade "level up" style success sound on rest completion
   const playRestCompletedTone = () => {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      if (!audioCtxRef.current) {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtx) audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume();
       
       const playNote = (freq: number, startTime: number, duration: number) => {
         const osc = ctx.createOscillator();
@@ -364,6 +369,16 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [showRestTimer, restTimeRemaining]);
 
   const startRestTimer = (secs: number = 90) => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtx) audioCtxRef.current = new AudioCtx();
+      }
+      if (audioCtxRef.current?.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+    } catch (e) {}
+    
     setRestTimeRemaining(secs);
     setShowRestTimer(true);
   };
