@@ -44,6 +44,7 @@ export default function ProgressScreen() {
     const weekEndDisplay = new Date(weekEnd);
     weekEndDisplay.setDate(weekEndDisplay.getDate() - 1);
     
+    return {
       workoutsCount: weekWorkouts.length,
       volume: totalVolume,
       sets: completedSetsCount,
