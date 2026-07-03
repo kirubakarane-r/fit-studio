@@ -167,6 +167,14 @@ export default function ActiveWorkoutScreen() {
                 );
               }
 
+              const hasInputs = isBW 
+                ? String(set.reps).trim() !== ''
+                : isCardio 
+                  ? String(set.weight).trim() !== '' && String(set.reps).trim() !== ''
+                  : String(set.weight).trim() !== '' && String(set.reps).trim() !== '';
+              
+              const isDisabled = set.done || !hasInputs;
+
               return createElement(
                 'div',
                 {
@@ -192,10 +200,13 @@ export default function ActiveWorkoutScreen() {
                   'button',
                   {
                     onClick: () => handleToggleSet(exIndex, setIndex),
-                    className: `w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                    disabled: isDisabled,
+                    className: `w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                       set.done
-                        ? 'bg-emerald-500 text-black border border-emerald-500'
-                        : 'bg-neutral-900 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+                        ? 'bg-emerald-500 text-black border border-emerald-500 cursor-not-allowed'
+                        : hasInputs
+                          ? 'bg-neutral-900 text-neutral-500 hover:text-neutral-300 border border-neutral-800 cursor-pointer'
+                          : 'bg-neutral-900 text-neutral-700 border border-neutral-800/50 cursor-not-allowed opacity-50'
                     }`
                   },
                   createElement(Check, { className: 'w-4 h-4 stroke-[3]' })
