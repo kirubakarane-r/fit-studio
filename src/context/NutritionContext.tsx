@@ -140,7 +140,7 @@ export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const handleAddMealEntry = async (entry: Omit<MealEntry, 'id'>) => {
     if (!user) return;
-    const id = 'm' + Date.now();
+    const id = 'm' + Date.now() + Math.random().toString(36).substring(2, 9);
     const newEntry: MealEntry = { ...entry, id };
     const path = `users/${user.uid}/meals`;
     try {
