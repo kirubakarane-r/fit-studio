@@ -1,5 +1,5 @@
-import { createElement, useState, ChangeEvent, useRef } from 'react';
-import { X, Search, Check, ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown } from 'lucide-react';
+import { createElement, useState, ChangeEvent, useRef, useEffect } from 'react';
+import { X, Search, Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { capitalize, getMuscleColor } from '../utils/formatters';
 import { useWorkout } from '../context/WorkoutContext';
 
@@ -9,6 +9,9 @@ export default function CreatePlanModal() {
     setShowCreatePlanModal,
     exercises,
     handleCreatePlan,
+    handleUpdatePlan,
+    editingTemplate,
+    setEditingTemplate,
     setShowCreateLibraryModal,
   } = useWorkout();
 
@@ -20,6 +23,20 @@ export default function CreatePlanModal() {
   const [muscleFilter, setMuscleFilter] = useState('');
 
   const chipsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (showCreatePlanModal) {
+      if (editingTemplate) {
+        setPlanName(editingTemplate.name);
+        setSelectedIds([...editingTemplate.exercises]);
+      } else {
+        setPlanName('');
+        setSelectedIds([]);
+      }
+      setSearch('');
+      setMuscleFilter('');
+    }
+  }, [showCreatePlanModal, editingTemplate]);
 
   const scrollChips = (direction: 'left' | 'right') => {
     if (chipsRef.current) {
@@ -37,36 +54,21 @@ export default function CreatePlanModal() {
     );
   };
 
-  const handleMoveUp = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setSelectedIds(prev => {
-      const idx = prev.indexOf(id);
-      if (idx <= 0) return prev;
-      const copy = [...prev];
-      [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
-      return copy;
-    });
-  };
-
-  const handleMoveDown = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setSelectedIds(prev => {
-      const idx = prev.indexOf(id);
-      if (idx === -1 || idx === prev.length - 1) return prev;
-      const copy = [...prev];
-      [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]];
-      return copy;
-    });
-  };
-
   const handleSave = () => {
     const name = planName.trim();
     if (!name) return;
-    handleCreatePlan(name, selectedIds);
+    
+    if (editingTemplate) {
+      handleUpdatePlan(editingTemplate.name, name, selectedIds);
+    } else {
+      handleCreatePlan(name, selectedIds);
+    }
+    
     setPlanName('');
     setSelectedIds([]);
     setSearch('');
     setMuscleFilter('');
+    setEditingTemplate(null);
     setShowCreatePlanModal(false);
   };
 
@@ -75,11 +77,10 @@ export default function CreatePlanModal() {
     const matchesMuscle = !muscleFilter || e.muscle === muscleFilter;
     return matchesSearch && matchesMuscle;
   }).sort((a, b) => {
-    const aIdx = selectedIds.indexOf(a.id);
-    const bIdx = selectedIds.indexOf(b.id);
-    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-    if (aIdx !== -1) return -1;
-    if (bIdx !== -1) return 1;
+    const aSelected = selectedIds.includes(a.id);
+    const bSelected = selectedIds.includes(b.id);
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
     return 0;
   });
 
@@ -103,13 +104,16 @@ export default function CreatePlanModal() {
         createElement(
           'div',
           null,
-          createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, 'Create New Workout Plan'),
+          createElement('h3', { className: 'text-base font-extrabold text-neutral-100' }, editingTemplate ? 'Edit Workout Plan' : 'Create New Workout Plan'),
           createElement('p', { className: 'text-xs text-neutral-500 mt-0.5' }, 'Design a workout blueprint to launch instantly anytime.')
         ),
         createElement(
           'button',
           {
-            onClick: () => setShowCreatePlanModal(false),
+            onClick: () => {
+              setEditingTemplate(null);
+              setShowCreatePlanModal(false);
+            },
             className: 'text-neutral-500 hover:text-neutral-300 p-1.5 rounded-lg hover:bg-neutral-900 cursor-pointer'
           },
           createElement(X, { className: 'w-4 h-4' })
@@ -242,33 +246,9 @@ export default function CreatePlanModal() {
                   )
                 ),
                 createElement(
-                  'div',
-                  { className: 'flex items-center gap-2' },
-                  createElement(
-                    'span',
-                    { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
-                    capitalize(ex.muscle)
-                  ),
-                  isSelected && createElement(
-                    'div',
-                    { className: 'flex flex-col gap-0.5 ml-1' },
-                    createElement(
-                      'button',
-                      {
-                        onClick: (e: any) => handleMoveUp(e, ex.id),
-                        className: 'p-1 rounded-md bg-neutral-800 hover:bg-neutral-700 text-neutral-400'
-                      },
-                      createElement(ChevronUp, { className: 'w-3 h-3' })
-                    ),
-                    createElement(
-                      'button',
-                      {
-                        onClick: (e: any) => handleMoveDown(e, ex.id),
-                        className: 'p-1 rounded-md bg-neutral-800 hover:bg-neutral-700 text-neutral-400'
-                      },
-                      createElement(ChevronDown, { className: 'w-3 h-3' })
-                    )
-                  )
+                  'span',
+                  { className: `text-xs font-mono px-2 py-0.5 rounded-full border ${getMuscleColor(ex.muscle)}` },
+                  capitalize(ex.muscle)
                 )
               );
             })
@@ -306,7 +286,10 @@ export default function CreatePlanModal() {
         createElement(
           'button',
           {
-            onClick: () => setShowCreatePlanModal(false),
+            onClick: () => {
+              setEditingTemplate(null);
+              setShowCreatePlanModal(false);
+            },
             className: 'px-5 py-3 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 text-sm font-semibold rounded-xl cursor-pointer'
           },
           'Cancel'

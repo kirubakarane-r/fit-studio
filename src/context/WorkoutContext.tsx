@@ -98,6 +98,8 @@ export interface WorkoutContextType {
   setPendingDeleteWorkoutId: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTemplateToView: Template | null;
   setSelectedTemplateToView: React.Dispatch<React.SetStateAction<Template | null>>;
+  editingTemplate: Template | null;
+  setEditingTemplate: React.Dispatch<React.SetStateAction<Template | null>>;
 
   // Form / Input States
   newWorkoutName: string;
@@ -119,6 +121,7 @@ export interface WorkoutContextType {
 
   // Workout Management Handlers
   handleCreatePlan: (name: string, selectedExerciseIds: string[]) => Promise<void>;
+  handleUpdatePlan: (oldName: string, name: string, selectedExerciseIds: string[]) => Promise<void>;
   handleStartWorkoutFromTemplate: (template: Template) => void;
   handleDeleteTemplate: (name: string) => Promise<void>;
   handleOpenNewWorkout: () => void;
@@ -384,6 +387,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [showRestPrompt, setShowRestPrompt] = useState(false);
   const [pendingDeleteWorkoutId, setPendingDeleteWorkoutId] = useState<string | null>(null);
   const [selectedTemplateToView, setSelectedTemplateToView] = useState<Template | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
 
   // --------------------------------------------------
   // FORM / INPUT STATES
@@ -422,6 +426,26 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const id = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
       setDoc(doc(db, 'users', user.uid, 'templates', id), newTemplate);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, path);
+    }
+  };
+
+  const handleUpdatePlan = async (oldName: string, name: string, selectedExerciseIds: string[]) => {
+    if (!user) return;
+    const newTemplate: Template = {
+      name: name.trim(),
+      exercises: selectedExerciseIds
+    };
+    const path = `users/${user.uid}/templates`;
+    try {
+      const oldId = oldName.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+      const newId = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+      
+      if (oldId !== newId) {
+        deleteDoc(doc(db, 'users', user.uid, 'templates', oldId));
+      }
+      setDoc(doc(db, 'users', user.uid, 'templates', newId), newTemplate);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
@@ -827,6 +851,8 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setPendingDeleteWorkoutId,
       selectedTemplateToView,
       setSelectedTemplateToView,
+      editingTemplate,
+      setEditingTemplate,
       newWorkoutName,
       setNewWorkoutName,
       saveAsTemplate,
@@ -842,6 +868,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       newLibType,
       setNewLibType,
       handleCreatePlan,
+      handleUpdatePlan,
       handleStartWorkoutFromTemplate,
       handleDeleteTemplate,
       handleOpenNewWorkout,
