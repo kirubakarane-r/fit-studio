@@ -236,7 +236,7 @@ export default function ActiveWorkoutScreen() {
     // Header status bar
     createElement(
       'div',
-      { className: 'flex items-center justify-between bg-[#121212] border border-neutral-800 rounded-2xl p-4' },
+      { className: 'sticky top-0 z-40 flex items-center justify-between bg-[#121212] border border-neutral-800 rounded-2xl p-4 shadow-2xl shadow-black/50' },
       createElement(
         'div',
         { className: 'space-y-1' },

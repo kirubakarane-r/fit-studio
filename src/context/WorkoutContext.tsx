@@ -154,10 +154,11 @@ export interface WorkoutContextType {
     sets: number;
   };
   personalRecords: Array<{
+    muscle: string;
     exerciseName: string;
+    type: string;
     weight: number;
     reps: number;
-    oneRM: number;
     date: string;
   }>;
 }
@@ -781,28 +782,43 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const weekStats = getWeekStats();
 
   const getPersonalRecords = () => {
-    // PR is highest estimated 1RM: weight * (1 + reps/30) for weighted exercises
-    const prMap: Record<string, { exerciseName: string; weight: number; reps: number; oneRM: number; date: string }> = {};
+    const prMap: Record<string, { muscle: string; exerciseName: string; type: string; weight: number; reps: number; date: string }> = {};
 
     workouts.forEach(w => {
       w.exercises.forEach(ex => {
         const exData = exercises.find(e => e.id === ex.id);
-        if (!exData || exData.type !== 'weight') return;
+        if (!exData) return;
 
         ex.sets.forEach(s => {
           if (!s.done) return;
           const wt = parseFloat(s.weight) || 0;
           const rp = parseInt(s.reps) || 0;
-          if (wt <= 0 || rp <= 0) return;
+          if (wt <= 0 && rp <= 0) return;
 
-          const oneRM = wt * (1 + rp / 30);
-          
-          if (!prMap[ex.id] || oneRM > prMap[ex.id].oneRM) {
+          const currentPR = prMap[ex.id];
+          let isNewPR = false;
+
+          if (!currentPR) {
+            isNewPR = true;
+          } else {
+            if (exData.type === 'weight') {
+              if (wt > currentPR.weight) isNewPR = true;
+              else if (wt === currentPR.weight && rp > currentPR.reps) isNewPR = true;
+            } else if (exData.type === 'bodyweight') {
+              if (rp > currentPR.reps) isNewPR = true;
+            } else if (exData.type === 'cardio') {
+              if (rp > currentPR.reps) isNewPR = true;
+              else if (rp === currentPR.reps && wt > currentPR.weight) isNewPR = true;
+            }
+          }
+
+          if (isNewPR) {
             prMap[ex.id] = {
+              muscle: exData.muscle,
               exerciseName: exData.name,
+              type: exData.type,
               weight: wt,
               reps: rp,
-              oneRM,
               date: w.date
             };
           }
@@ -810,7 +826,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
     });
 
-    return Object.values(prMap).sort((a, b) => b.oneRM - a.oneRM);
+    return Object.values(prMap).sort((a, b) => a.muscle.localeCompare(b.muscle) || a.exerciseName.localeCompare(b.exerciseName));
   };
 
   const personalRecords = getPersonalRecords();
