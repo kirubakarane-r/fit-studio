@@ -62,3 +62,14 @@ export interface DailyNutritionTarget {
   carbs: number;
   fat: number;
 }
+
+export interface BodyMeasurement {
+  id: string;
+  date: string;       // YYYY-MM-DD local format
+  weight: number;     // in kg
+  waist: number;      // in cm
+  chest: number;      // in cm
+  arm: number;        // in cm
+  createdAt: string;  // ISO timestamp
+}
+

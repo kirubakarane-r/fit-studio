@@ -65,9 +65,9 @@ export interface WorkoutContextType {
   setActiveWorkout: React.Dispatch<React.SetStateAction<Workout | null>>;
   
   // Navigation
-  screen: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition';
-  setScreen: React.Dispatch<React.SetStateAction<'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition'>>;
-  navigateTo: (target: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition') => void;
+  screen: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements';
+  setScreen: React.Dispatch<React.SetStateAction<'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements'>>;
+  navigateTo: (target: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements') => void;
 
   // Timers State
   elapsedTime: number;
@@ -185,7 +185,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   });
 
-  const [screen, setScreen] = useState<'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition'>(() => {
+  const [screen, setScreen] = useState<'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements'>(() => {
     try {
       const saved = localStorage.getItem('activeWorkout');
       return saved ? 'active' : 'home';
@@ -429,7 +429,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // --------------------------------------------------
   // NAVIGATION ROUTER GUARD
   // --------------------------------------------------
-  const navigateTo = (target: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition') => {
+  const navigateTo = (target: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements') => {
     if (activeWorkout) {
       setScreen('active');
     } else {

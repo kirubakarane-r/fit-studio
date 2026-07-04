@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { Dumbbell, History, TrendingUp, BookOpen, Apple } from 'lucide-react';
+import { Dumbbell, History, Ruler, TrendingUp, BookOpen, Apple } from 'lucide-react';
 import { useWorkout } from '../context/WorkoutContext';
 
 export default function BottomNav() {
@@ -36,6 +36,19 @@ export default function BottomNav() {
         },
         createElement(History, { className: 'w-5 h-5' }),
         createElement('span', null, 'History')
+      ),
+
+      // Body button
+      createElement(
+        'button',
+        {
+          onClick: () => navigateTo('measurements'),
+          className: `flex-1 flex flex-col items-center justify-center gap-1 h-full text-[10px] font-bold tracking-tight cursor-pointer ${
+            screen === 'measurements' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-300'
+          }`
+        },
+        createElement(Ruler, { className: 'w-5 h-5' }),
+        createElement('span', null, 'Body')
       ),
 
       // Progress button

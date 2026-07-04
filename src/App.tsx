@@ -4,14 +4,16 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { WorkoutProvider, useWorkout } from './context/WorkoutContext';
 import { NutritionProvider, useNutrition } from './context/NutritionContext';
 
-// Screen Components (consume useWorkout)
 import HomeScreen from './components/HomeScreen';
 import ActiveWorkoutScreen from './components/ActiveWorkoutScreen';
 import HistoryScreen from './components/HistoryScreen';
 import ProgressScreen from './components/ProgressScreen';
 import ExercisesScreen from './components/ExercisesScreen';
 import NutritionScreen from './components/NutritionScreen';
+import MeasurementsScreen from './components/MeasurementsScreen';
 import LoginScreen from './components/LoginScreen';
+
+import { MeasurementsProvider } from './context/MeasurementsContext';
 
 // Modals, Overlays & Navigation
 import NewWorkoutModal from './components/NewWorkoutModal';
@@ -157,6 +159,7 @@ function WorkoutApp() {
             {screen === 'progress' && <ProgressScreen />}
             {screen === 'exercises' && <ExercisesScreen />}
             {screen === 'nutrition' && <NutritionScreen />}
+            {screen === 'measurements' && <MeasurementsScreen />}
           </>
         )}
       </main>
@@ -204,9 +207,11 @@ export default function App() {
   return (
     <AuthProvider>
       <NutritionProvider>
-        <WorkoutProvider>
-          <WorkoutApp />
-        </WorkoutProvider>
+        <MeasurementsProvider>
+          <WorkoutProvider>
+            <WorkoutApp />
+          </WorkoutProvider>
+        </MeasurementsProvider>
       </NutritionProvider>
     </AuthProvider>
   );
