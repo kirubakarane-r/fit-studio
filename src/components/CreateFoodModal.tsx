@@ -261,7 +261,7 @@ export default function CreateFoodModal() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Added While Cooking (Optional)</label>
+                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Cooking Adjustments / Additions</label>
                 <textarea
                   placeholder="e.g. cooked in 1 tbsp olive oil, added 2 eggs"
                   value={cookingDetails}
@@ -274,7 +274,7 @@ export default function CreateFoodModal() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Product Photo / Nutrition Label (Optional)</label>
+                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Product Photo / Nutrition Label</label>
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <button
