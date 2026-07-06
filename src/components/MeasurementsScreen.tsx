@@ -235,16 +235,16 @@ export default function MeasurementsScreen() {
     // Header
     createElement(
       'div',
-      { className: 'flex justify-between items-start gap-4' },
+      { className: 'flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3' },
       createElement(
         'div',
-        { className: 'flex-1 min-w-0 pr-2' },
-        createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider truncate' }, 'Body Measurements'),
-        createElement('p', { className: 'text-xs text-neutral-500 mt-1 leading-relaxed max-w-[85%] sm:max-w-none' }, 'Track and analyze weight, waist, chest, and arms weekly.')
+        null,
+        createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Body Measurements'),
+        createElement('p', { className: 'text-xs text-neutral-500 mt-1 leading-relaxed' }, 'Track and analyze weight, waist, chest, and arms weekly.')
       ),
       createElement(
         'div',
-        { className: 'flex items-center gap-2 shrink-0 mt-0.5' },
+        { className: 'flex items-center gap-2 self-end sm:self-auto shrink-0' },
         currentWeekEntry && createElement(
           'button',
           {
