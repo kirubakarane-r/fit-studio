@@ -235,21 +235,21 @@ export default function MeasurementsScreen() {
     // Header
     createElement(
       'div',
-      { className: 'flex justify-between items-center' },
+      { className: 'flex justify-between items-start gap-4' },
       createElement(
         'div',
-        null,
-        createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Body Measurements'),
-        createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Track and analyze weight, waist, chest, and arms weekly.')
+        { className: 'flex-1 min-w-0 pr-2' },
+        createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider truncate' }, 'Body Measurements'),
+        createElement('p', { className: 'text-xs text-neutral-500 mt-1 leading-relaxed max-w-[85%] sm:max-w-none' }, 'Track and analyze weight, waist, chest, and arms weekly.')
       ),
       createElement(
         'div',
-        { className: 'flex items-center gap-2' },
+        { className: 'flex items-center gap-2 shrink-0 mt-0.5' },
         currentWeekEntry && createElement(
           'button',
           {
             onClick: () => handleDelete(currentWeekEntry.id),
-            className: 'p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center justify-center',
+            className: 'p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center justify-center shrink-0',
             title: 'Delete entry'
           },
           createElement(Trash2, { className: 'w-4 h-4' })
@@ -263,7 +263,7 @@ export default function MeasurementsScreen() {
               }
               setShowForm(prev => !prev);
             },
-            className: `px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 cursor-pointer transition-all ${
+            className: `px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
               showForm 
                 ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:bg-neutral-850'
                 : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20'
