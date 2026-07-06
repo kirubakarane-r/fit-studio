@@ -275,43 +275,45 @@ export default function CreateFoodModal() {
 
               <div>
                 <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Product Photo / Nutrition Label (Optional)</label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-855 border border-neutral-800 text-neutral-300 text-sm font-semibold rounded-xl cursor-pointer transition-colors"
-                  >
-                    <Camera className="w-4 h-4 text-emerald-400" />
-                    <span>{imageBase64 ? 'Change Photo' : 'Take / Choose Photo'}</span>
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  {imageBase64 && (
+                <div className="space-y-3">
+                  <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => {
-                        setImageBase64(null);
-                        setMacrosGenerated(false);
-                        if (fileInputRef.current) fileInputRef.current.value = '';
-                      }}
-                      className="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wider cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 bg-neutral-900 hover:bg-neutral-855 border border-neutral-800 text-neutral-300 text-sm font-semibold rounded-xl cursor-pointer transition-colors"
                     >
-                      Remove
+                      <Camera className="w-4 h-4 text-emerald-400" />
+                      <span>{imageBase64 ? 'Change Photo' : 'Take / Choose Photo'}</span>
                     </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    {imageBase64 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageBase64(null);
+                          setMacrosGenerated(false);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        className="px-4 py-3 bg-neutral-900 border border-neutral-800 text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wider rounded-xl cursor-pointer flex items-center justify-center transition-colors shrink-0"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  
+                  {imageBase64 && (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-neutral-800">
+                      <img src={imageBase64} alt="Product Preview" className="w-full h-full object-cover animate-in fade-in duration-300" />
+                    </div>
                   )}
                 </div>
-                
-                {imageBase64 && (
-                  <div className="mt-3 relative w-32 h-32 rounded-xl overflow-hidden border border-neutral-800">
-                    <img src={imageBase64} alt="Product Preview" className="w-full h-full object-cover animate-in fade-in duration-300" />
-                  </div>
-                )}
               </div>
 
               <button

@@ -98,14 +98,10 @@ export default function NutritionScreen() {
               return (
                 <div key={item.id} className="flex justify-between items-center py-2 border-b border-neutral-800/50 last:border-0 group">
                   <div className="flex gap-3 items-center min-w-0">
-                    {food?.image && (
-                      <img src={food.image} alt="" className="w-10 h-10 rounded-xl object-cover border border-neutral-800 shrink-0" />
-                    )}
                     <div className="flex flex-col min-w-0">
                       <span className="text-sm font-bold text-neutral-200 truncate">{item.foodName}</span>
                       <span className="text-xs text-neutral-500 font-medium truncate">
                         {item.servings} serving(s)
-                        {food?.cookingDetails && ` • Prep: ${food.cookingDetails}`}
                       </span>
                     </div>
                   </div>

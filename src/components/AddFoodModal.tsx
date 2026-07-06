@@ -122,17 +122,9 @@ export default function AddFoodModal() {
                         <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors shrink-0 ${isSelected ? 'bg-emerald-500 border-emerald-500' : 'bg-neutral-800/50 border-neutral-700'}`}>
                           {isSelected && <Check className="w-3.5 h-3.5 text-black" />}
                         </div>
-                        {food.image && (
-                          <img src={food.image} alt="" className="w-10 h-10 rounded-xl object-cover border border-neutral-800 shrink-0" />
-                        )}
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-bold text-neutral-200 truncate">{food.name}</span>
                           <span className="text-xs text-neutral-500 mt-0.5">{food.servingSize}</span>
-                          {food.cookingDetails && (
-                            <span className="text-[10px] text-neutral-400 italic mt-0.5 truncate max-w-[150px] sm:max-w-[200px]">
-                              Prep: {food.cookingDetails}
-                            </span>
-                          )}
                         </div>
                       </div>
                       <div className="text-right">
