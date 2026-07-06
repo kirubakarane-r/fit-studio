@@ -232,171 +232,12 @@ export default function MeasurementsScreen() {
     'div',
     { className: 'space-y-6 pb-20' },
     
-    // Header
+    // Header (clean title and description)
     createElement(
       'div',
-      { className: 'flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3' },
-      createElement(
-        'div',
-        null,
-        createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Body Measurements'),
-        createElement('p', { className: 'text-xs text-neutral-500 mt-1 leading-relaxed' }, 'Track and analyze weight, waist, chest, and arms weekly.')
-      ),
-      createElement(
-        'div',
-        { className: 'flex items-center gap-2 self-end sm:self-auto shrink-0' },
-        currentWeekEntry && createElement(
-          'button',
-          {
-            onClick: () => handleDelete(currentWeekEntry.id),
-            className: 'p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center justify-center shrink-0',
-            title: 'Delete entry'
-          },
-          createElement(Trash2, { className: 'w-4 h-4' })
-        ),
-        createElement(
-          'button',
-          {
-            onClick: () => {
-              if (currentWeekEntry) {
-                setDate(currentWeekEntry.date);
-              }
-              setShowForm(prev => !prev);
-            },
-            className: `px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
-              showForm 
-                ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:bg-neutral-850'
-                : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20'
-            }`
-          },
-          showForm 
-            ? createElement(X, { className: 'w-3.5 h-3.5' }) 
-            : currentWeekEntry 
-              ? createElement(Edit2, { className: 'w-3.5 h-3.5' }) 
-              : createElement(Plus, { className: 'w-3.5 h-3.5' }),
-          createElement('span', null, showForm ? 'Cancel' : currentWeekEntry ? 'Edit Entry' : 'Log Entry')
-        )
-      )
-    ),
-
-    // Log Form collapsible
-    showForm && createElement(
-      'div',
-      { className: 'bg-[#121212] border border-neutral-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200' },
-      createElement('h3', { className: 'text-sm font-bold text-neutral-200 uppercase tracking-wider mb-4' }, 'Record Weekly Stats'),
-      
-      error && createElement('div', { className: 'p-3 mb-4 bg-red-950/20 border border-red-500/20 rounded-xl text-xs text-red-400 text-center' }, error),
-      
-      createElement(
-        'form',
-        { onSubmit: handleSubmit, className: 'space-y-4' },
-        createElement(
-          'div',
-          null,
-          createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Date (Usually Sundays)'),
-          createElement(
-            'div',
-            { className: 'flex items-center gap-2 bg-neutral-950/50 border border-neutral-900 px-3 py-2.5 rounded-xl' },
-            createElement(Calendar, { className: 'w-4 h-4 text-neutral-500' }),
-            createElement('input', {
-              type: 'date',
-              required: true,
-              value: date,
-              onChange: (e: any) => setDate(e.target.value),
-              className: 'w-full bg-transparent border-none text-sm text-neutral-200 focus:outline-none'
-            })
-          )
-        ),
-
-        createElement(
-          'div',
-          { className: 'grid grid-cols-2 gap-4' },
-          createElement(
-            'div',
-            null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Weight (kg)'),
-            createElement('input', {
-              type: 'number',
-              step: '0.1',
-              required: true,
-              min: '0',
-              placeholder: 'e.g. 78.5',
-              value: weight,
-              onChange: (e: any) => setWeight(e.target.value),
-              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
-            })
-          ),
-          createElement(
-            'div',
-            null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Waist (cm)'),
-            createElement('input', {
-              type: 'number',
-              step: '0.1',
-              required: true,
-              min: '0',
-              placeholder: 'e.g. 82.0',
-              value: waist,
-              onChange: (e: any) => setWaist(e.target.value),
-              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
-            })
-          ),
-          createElement(
-            'div',
-            null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Chest (cm)'),
-            createElement('input', {
-              type: 'number',
-              step: '0.1',
-              required: true,
-              min: '0',
-              placeholder: 'e.g. 102.5',
-              value: chest,
-              onChange: (e: any) => setChest(e.target.value),
-              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
-            })
-          ),
-          createElement(
-            'div',
-            null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Left Arm (cm)'),
-            createElement('input', {
-              type: 'number',
-              step: '0.1',
-              required: true,
-              min: '0',
-              placeholder: 'e.g. 36.5',
-              value: armLeft,
-              onChange: (e: any) => setArmLeft(e.target.value),
-              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
-            })
-          ),
-          createElement(
-            'div',
-            null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Right Arm (cm)'),
-            createElement('input', {
-              type: 'number',
-              step: '0.1',
-              required: true,
-              min: '0',
-              placeholder: 'e.g. 36.5',
-              value: armRight,
-              onChange: (e: any) => setArmRight(e.target.value),
-              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
-            })
-          )
-        ),
-
-        createElement(
-          'button',
-          {
-            type: 'submit',
-            className: 'w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black uppercase tracking-widest rounded-xl cursor-pointer transition-colors mt-2'
-          },
-          'Save Measurement'
-        )
-      )
+      null,
+      createElement('h2', { className: 'text-base font-extrabold text-neutral-200 uppercase tracking-wider' }, 'Body Measurements'),
+      createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Track and analyze weight, waist, chest, and arms weekly.')
     ),
 
     // Week Offset Picker
@@ -417,6 +258,177 @@ export default function MeasurementsScreen() {
       renderComparisonCard('Chest Size', 'chest', Ruler, 'cm'),
       renderComparisonCard('Left Arm Size', 'armLeft', Ruler, 'cm'),
       renderComparisonCard('Right Arm Size', 'armRight', Ruler, 'cm')
-    )
+    ),
+
+    // Bottom Actions or Form collapsible
+    showForm 
+      ? createElement(
+          'div',
+          { className: 'bg-[#121212] border border-neutral-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 mt-2' },
+          createElement(
+            'div',
+            { className: 'flex justify-between items-center mb-4' },
+            createElement('h3', { className: 'text-sm font-bold text-neutral-200 uppercase tracking-wider' }, currentWeekEntry ? 'Edit Weekly Stats' : 'Record Weekly Stats'),
+            createElement(
+              'button',
+              {
+                type: 'button',
+                onClick: () => setShowForm(false),
+                className: 'p-1 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-neutral-200 cursor-pointer transition-colors'
+              },
+              createElement(X, { className: 'w-4 h-4' })
+            )
+          ),
+          
+          error && createElement('div', { className: 'p-3 mb-4 bg-red-950/20 border border-red-500/20 rounded-xl text-xs text-red-400 text-center' }, error),
+          
+          createElement(
+            'form',
+            { onSubmit: handleSubmit, className: 'space-y-4' },
+            createElement(
+              'div',
+              { className: 'flex items-center gap-2 bg-neutral-950/50 border border-neutral-900 px-3 py-2.5 rounded-xl' },
+              createElement(Calendar, { className: 'w-4 h-4 text-neutral-500' }),
+              createElement('input', {
+                type: 'date',
+                required: true,
+                value: date,
+                onChange: (e: any) => setDate(e.target.value),
+                className: 'w-full bg-transparent border-none text-sm text-neutral-200 focus:outline-none'
+              })
+            ),
+            
+            createElement(
+              'div',
+              { className: 'grid grid-cols-2 gap-4' },
+              createElement(
+                'div',
+                null,
+                createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Weight (kg)'),
+                createElement('input', {
+                  type: 'number',
+                  step: '0.1',
+                  required: true,
+                  min: '0',
+                  placeholder: 'e.g. 78.5',
+                  value: weight,
+                  onChange: (e: any) => setWeight(e.target.value),
+                  className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+                })
+              ),
+              createElement(
+                'div',
+                null,
+                createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Waist (cm)'),
+                createElement('input', {
+                  type: 'number',
+                  step: '0.1',
+                  required: true,
+                  min: '0',
+                  placeholder: 'e.g. 82.0',
+                  value: waist,
+                  onChange: (e: any) => setWaist(e.target.value),
+                  className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+                })
+              ),
+              createElement(
+                'div',
+                null,
+                createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Chest (cm)'),
+                createElement('input', {
+                  type: 'number',
+                  step: '0.1',
+                  required: true,
+                  min: '0',
+                  placeholder: 'e.g. 102.5',
+                  value: chest,
+                  onChange: (e: any) => setChest(e.target.value),
+                  className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+                })
+              ),
+              createElement(
+                'div',
+                null,
+                createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Left Arm (cm)'),
+                createElement('input', {
+                  type: 'number',
+                  step: '0.1',
+                  required: true,
+                  min: '0',
+                  placeholder: 'e.g. 36.5',
+                  value: armLeft,
+                  onChange: (e: any) => setArmLeft(e.target.value),
+                  className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+                })
+              ),
+              createElement(
+                'div',
+                { className: 'col-span-2 sm:col-span-1' },
+                createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Right Arm (cm)'),
+                createElement('input', {
+                  type: 'number',
+                  step: '0.1',
+                  required: true,
+                  min: '0',
+                  placeholder: 'e.g. 36.5',
+                  value: armRight,
+                  onChange: (e: any) => setArmRight(e.target.value),
+                  className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+                })
+              )
+            ),
+            
+            createElement(
+              'button',
+              {
+                type: 'submit',
+                className: 'w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black uppercase tracking-widest rounded-xl cursor-pointer transition-colors mt-4 shadow-lg shadow-emerald-500/10'
+              },
+              'Save Measurement'
+            )
+          )
+        )
+      : currentWeekEntry 
+        ? createElement(
+            'div',
+            { className: 'flex gap-3 mt-2' },
+            createElement(
+              'button',
+              {
+                onClick: () => {
+                  setDate(currentWeekEntry.date);
+                  setShowForm(true);
+                },
+                className: 'flex-1 py-3.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-emerald-500/30 text-neutral-300 hover:text-emerald-400 font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all'
+              },
+              createElement(Edit2, { className: 'w-4 h-4' }),
+              'Edit Weekly Entry'
+            ),
+            createElement(
+              'button',
+              {
+                onClick: () => handleDelete(currentWeekEntry.id),
+                className: 'py-3.5 px-5 bg-red-950/20 hover:bg-red-950/40 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all'
+              },
+              createElement(Trash2, { className: 'w-4 h-4' }),
+              'Delete'
+            )
+          )
+        : createElement(
+            'button',
+            {
+              onClick: () => {
+                if (weekOffset === 0) {
+                  setDate(new Date().toLocaleDateString('en-CA'));
+                } else {
+                  setDate(selectedSunday.toLocaleDateString('en-CA'));
+                }
+                setShowForm(true);
+              },
+              className: 'w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold uppercase tracking-widest text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all mt-2 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20'
+            },
+            createElement(Plus, { className: 'w-4 h-4' }),
+            'Log Weekly Entry'
+          )
   );
 }
