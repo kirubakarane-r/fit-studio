@@ -146,10 +146,15 @@ export default function CreateFoodModal() {
       protein: parseFloat(protein),
       carbs: parseFloat(carbs),
       fat: parseFloat(fat),
-      servingSize: `${servingAmount} ${servingUnit}`,
-      cookingDetails: cookingDetails.trim() || undefined,
-      image: imageBase64 || undefined
+      servingSize: `${servingAmount} ${servingUnit}`
     };
+
+    if (cookingDetails.trim()) {
+      newFood.cookingDetails = cookingDetails.trim();
+    }
+    if (imageBase64) {
+      newFood.image = imageBase64;
+    }
 
     await handleAddFood(newFood);
     
