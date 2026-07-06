@@ -177,14 +177,6 @@ export default function MeasurementsScreen() {
         );
         showComparison = true;
       }
-    } else {
-      // If selected week is missing, check if we can display the latest entry ever as a fallback
-      const latestEntry = measurements[0];
-      if (latestEntry && latestEntry[metric] !== undefined) {
-        valueDisplay = `${latestEntry[metric].toFixed(1)} ${unit}`;
-        pastDisplay = `Logged ${formatDateShort(latestEntry.date)}`;
-        showComparison = true;
-      }
     }
 
     return createElement(
@@ -251,17 +243,39 @@ export default function MeasurementsScreen() {
         createElement('p', { className: 'text-xs text-neutral-500 mt-1' }, 'Track and analyze weight, waist, chest, and arms weekly.')
       ),
       createElement(
-        'button',
-        {
-          onClick: () => setShowForm(prev => !prev),
-          className: `px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 cursor-pointer transition-all ${
-            showForm 
-              ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:bg-neutral-850'
-              : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20'
-          }`
-        },
-        showForm ? createElement(X, { className: 'w-3.5 h-3.5' }) : createElement(Plus, { className: 'w-3.5 h-3.5' }),
-        createElement('span', null, showForm ? 'Cancel' : 'Log Entry')
+        'div',
+        { className: 'flex items-center gap-2' },
+        currentWeekEntry && createElement(
+          'button',
+          {
+            onClick: () => handleDelete(currentWeekEntry.id),
+            className: 'p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center justify-center',
+            title: 'Delete entry'
+          },
+          createElement(Trash2, { className: 'w-4 h-4' })
+        ),
+        createElement(
+          'button',
+          {
+            onClick: () => {
+              if (currentWeekEntry) {
+                setDate(currentWeekEntry.date);
+              }
+              setShowForm(prev => !prev);
+            },
+            className: `px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 cursor-pointer transition-all ${
+              showForm 
+                ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:bg-neutral-850'
+                : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20'
+            }`
+          },
+          showForm 
+            ? createElement(X, { className: 'w-3.5 h-3.5' }) 
+            : currentWeekEntry 
+              ? createElement(Edit2, { className: 'w-3.5 h-3.5' }) 
+              : createElement(Plus, { className: 'w-3.5 h-3.5' }),
+          createElement('span', null, showForm ? 'Cancel' : currentWeekEntry ? 'Edit Entry' : 'Log Entry')
+        )
       )
     ),
 
@@ -390,36 +404,7 @@ export default function MeasurementsScreen() {
       'div',
       { className: 'flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl' },
       createElement('button', { onClick: () => setWeekOffset(prev => prev - 1), className: 'p-2 hover:bg-neutral-800 rounded-lg cursor-pointer' }, createElement(ChevronLeft, { className: 'w-5 h-5 text-neutral-400' })),
-      createElement(
-        'div',
-        { className: 'flex items-center gap-2' },
-        createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'Current Week' : formatDateRange(selectedSunday)),
-        currentWeekEntry && createElement(
-          'div',
-          { className: 'flex items-center gap-1.5 ml-2 border-l border-neutral-800/80 pl-2' },
-          createElement(
-            'button',
-            {
-              onClick: () => {
-                setDate(currentWeekEntry.date);
-                setShowForm(true);
-              },
-              className: 'p-1 hover:bg-neutral-800 rounded-md text-neutral-400 hover:text-emerald-400 cursor-pointer transition-colors flex items-center justify-center',
-              title: 'Edit measurement'
-            },
-            createElement(Edit2, { className: 'w-3.5 h-3.5' })
-          ),
-          createElement(
-            'button',
-            {
-              onClick: () => handleDelete(currentWeekEntry.id),
-              className: 'p-1 hover:bg-neutral-800 rounded-md text-neutral-400 hover:text-red-400 cursor-pointer transition-colors flex items-center justify-center',
-              title: 'Delete measurement'
-            },
-            createElement(Trash2, { className: 'w-3.5 h-3.5' })
-          )
-        )
-      ),
+      createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'Current Week' : formatDateRange(selectedSunday)),
       createElement('button', { onClick: () => setWeekOffset(prev => prev + 1), disabled: weekOffset >= 0, className: `p-2 rounded-lg ${weekOffset >= 0 ? 'opacity-50' : 'hover:bg-neutral-800 cursor-pointer'}` }, createElement(ChevronRight, { className: 'w-5 h-5 text-neutral-400' }))
     ),
 
