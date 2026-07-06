@@ -1,8 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { X, Save, Apple, Sparkles, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Save, Apple, Sparkles, ChevronDown, Camera } from 'lucide-react';
 import { useNutrition } from '../context/NutritionContext';
 import { FoodItem } from '../types';
 import { fetchFoodMacros } from '../utils/gemini';
+
+const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 800): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => {
+      resolve(base64Str);
+    };
+  });
+};
 
 export default function CreateFoodModal() {
   const { showCreateFoodModal, setShowCreateFoodModal, setShowAddFoodModal, handleAddFood, editingFood, setEditingFood } = useNutrition();
@@ -10,6 +43,25 @@ export default function CreateFoodModal() {
   const [name, setName] = useState('');
   const [servingAmount, setServingAmount] = useState('');
   const [servingUnit, setServingUnit] = useState('grams');
+  const [cookingDetails, setCookingDetails] = useState('');
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string;
+      if (base64) {
+        const compressed = await compressImage(base64);
+        setImageBase64(compressed);
+        setMacrosGenerated(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
   
   // Read-only macro states
   const [calories, setCalories] = useState('');
@@ -35,6 +87,8 @@ export default function CreateFoodModal() {
         setProtein(String(editingFood.protein));
         setCarbs(String(editingFood.carbs));
         setFat(String(editingFood.fat));
+        setCookingDetails(editingFood.cookingDetails || '');
+        setImageBase64(editingFood.image || null);
         setMacrosGenerated(true);
       } else {
         setName('');
@@ -44,6 +98,8 @@ export default function CreateFoodModal() {
         setProtein('');
         setCarbs('');
         setFat('');
+        setCookingDetails('');
+        setImageBase64(null);
         setMacrosGenerated(false);
       }
       setIsGenerating(false);
@@ -59,7 +115,13 @@ export default function CreateFoodModal() {
     setMacrosGenerated(false);
     
     try {
-      const data = await fetchFoodMacros(name, servingAmount, servingUnit);
+      const data = await fetchFoodMacros(
+        name, 
+        servingAmount, 
+        servingUnit, 
+        cookingDetails ? cookingDetails.trim() : undefined, 
+        imageBase64 || undefined
+      );
       setCalories(String(Math.round(data.calories)));
       setProtein(String(Math.round(data.protein * 10) / 10));
       setCarbs(String(Math.round(data.carbs * 10) / 10));
@@ -84,7 +146,9 @@ export default function CreateFoodModal() {
       protein: parseFloat(protein),
       carbs: parseFloat(carbs),
       fat: parseFloat(fat),
-      servingSize: `${servingAmount} ${servingUnit}`
+      servingSize: `${servingAmount} ${servingUnit}`,
+      cookingDetails: cookingDetails.trim() || undefined,
+      image: imageBase64 || undefined
     };
 
     await handleAddFood(newFood);
@@ -189,6 +253,60 @@ export default function CreateFoodModal() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Added While Cooking (Optional)</label>
+                <textarea
+                  placeholder="e.g. cooked in 1 tbsp olive oil, added 2 eggs"
+                  value={cookingDetails}
+                  onChange={(e) => {
+                    setCookingDetails(e.target.value);
+                    setMacrosGenerated(false);
+                  }}
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors placeholder-neutral-600 h-20 resize-none font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Product Photo / Nutrition Label (Optional)</label>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-855 border border-neutral-800 text-neutral-300 text-sm font-semibold rounded-xl cursor-pointer transition-colors"
+                  >
+                    <Camera className="w-4 h-4 text-emerald-400" />
+                    <span>{imageBase64 ? 'Change Photo' : 'Take / Choose Photo'}</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  {imageBase64 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageBase64(null);
+                        setMacrosGenerated(false);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                      className="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wider cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                
+                {imageBase64 && (
+                  <div className="mt-3 relative w-32 h-32 rounded-xl overflow-hidden border border-neutral-800">
+                    <img src={imageBase64} alt="Product Preview" className="w-full h-full object-cover animate-in fade-in duration-300" />
+                  </div>
+                )}
               </div>
 
               <button

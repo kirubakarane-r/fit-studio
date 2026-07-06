@@ -8,7 +8,7 @@ import { BodyMeasurement } from '../types';
 export interface MeasurementsContextType {
   measurements: BodyMeasurement[];
   loading: boolean;
-  handleSaveMeasurement: (date: string, weight: number, waist: number, chest: number, arm: number) => Promise<void>;
+  handleSaveMeasurement: (date: string, weight: number, waist: number, chest: number, armLeft: number, armRight: number) => Promise<void>;
   handleDeleteMeasurement: (id: string) => Promise<void>;
 }
 
@@ -30,7 +30,14 @@ export const MeasurementsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const unsub = onSnapshot(collection(db, 'users', user.uid, 'measurements'), (snap) => {
       const list: BodyMeasurement[] = [];
       snap.forEach(d => {
-        list.push(d.data() as BodyMeasurement);
+        const data = d.data() as BodyMeasurement;
+        // Fallback for legacy arm field
+        if (data.armLeft === undefined && data.armRight === undefined) {
+          const legacyArm = data.arm ?? 0;
+          data.armLeft = legacyArm;
+          data.armRight = legacyArm;
+        }
+        list.push(data);
       });
       // Sort measurements by date descending (latest first)
       list.sort((a, b) => b.date.localeCompare(a.date));
@@ -43,7 +50,7 @@ export const MeasurementsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => unsub();
   }, [user]);
 
-  const handleSaveMeasurement = async (date: string, weight: number, waist: number, chest: number, arm: number) => {
+  const handleSaveMeasurement = async (date: string, weight: number, waist: number, chest: number, armLeft: number, armRight: number) => {
     if (!user) return;
     
     // Check if measurement for this date already exists to overwrite/update it, or generate new id
@@ -56,7 +63,8 @@ export const MeasurementsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       weight,
       waist,
       chest,
-      arm,
+      armLeft,
+      armRight,
       createdAt: existing ? existing.createdAt : new Date().toISOString()
     };
 

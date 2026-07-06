@@ -4,7 +4,7 @@ import { useNutrition } from '../context/NutritionContext';
 import { MealEntry } from '../types';
 
 export default function NutritionScreen() {
-  const { meals, target, loading, selectedDate, setSelectedDate, setActiveMealType, setShowAddFoodModal, setShowEditTargetModal, handleDeleteMealEntry, handleUpdateMealEntry } = useNutrition();
+  const { meals, target, loading, selectedDate, setSelectedDate, setActiveMealType, setShowAddFoodModal, setShowEditTargetModal, handleDeleteMealEntry, handleUpdateMealEntry, foods } = useNutrition();
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -93,38 +93,49 @@ export default function NutritionScreen() {
         
         {items.length > 0 ? (
           <div className="space-y-3 mb-4">
-            {items.map(item => (
-              <div key={item.id} className="flex justify-between items-center py-2 border-b border-neutral-800/50 last:border-0 group">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-neutral-200">{item.foodName}</span>
-                  <span className="text-xs text-neutral-500 font-medium">{item.servings} serving(s)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right flex flex-col">
-                    <span className="text-sm font-bold text-neutral-300">{Math.round(item.calories)} kcal</span>
-                    <span className="text-[10px] text-neutral-500 uppercase font-black">
-                      P: {Math.round(item.protein)} C: {Math.round(item.carbs)} F: {Math.round(item.fat)}
-                    </span>
+            {items.map(item => {
+              const food = foods.find(f => f.id === item.foodId);
+              return (
+                <div key={item.id} className="flex justify-between items-center py-2 border-b border-neutral-800/50 last:border-0 group">
+                  <div className="flex gap-3 items-center min-w-0">
+                    {food?.image && (
+                      <img src={food.image} alt="" className="w-10 h-10 rounded-xl object-cover border border-neutral-800 shrink-0" />
+                    )}
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-bold text-neutral-200 truncate">{item.foodName}</span>
+                      <span className="text-xs text-neutral-500 font-medium truncate">
+                        {item.servings} serving(s)
+                        {food?.cookingDetails && ` • Prep: ${food.cookingDetails}`}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center -mr-2">
-                    <button 
-                      onClick={() => handleEditServings(item)}
-                      className="p-1.5 text-neutral-500 hover:text-emerald-400 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                      title="Edit servings"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button 
-                      onClick={() => setItemToDelete(item)}
-                      className="p-1.5 text-neutral-500 hover:text-red-400 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                      title="Remove food"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right flex flex-col">
+                      <span className="text-sm font-bold text-neutral-300">{Math.round(item.calories)} kcal</span>
+                      <span className="text-[10px] text-neutral-500 uppercase font-black">
+                        P: {Math.round(item.protein)} C: {Math.round(item.carbs)} F: {Math.round(item.fat)}
+                      </span>
+                    </div>
+                    <div className="flex items-center -mr-2">
+                      <button 
+                        onClick={() => handleEditServings(item)}
+                        className="p-1.5 text-neutral-500 hover:text-emerald-400 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                        title="Edit servings"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => setItemToDelete(item)}
+                        className="p-1.5 text-neutral-500 hover:text-red-400 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                        title="Remove food"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="text-xs text-neutral-500 mb-4 font-medium">No food logged yet.</p>
