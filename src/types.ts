@@ -39,6 +39,8 @@ export interface FoodItem {
   carbs: number;
   fat: number;
   servingSize: string;
+  cookingDetails?: string;
+  image?: string;
 }
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
@@ -69,7 +71,9 @@ export interface BodyMeasurement {
   weight: number;     // in kg
   waist: number;      // in cm
   chest: number;      // in cm
-  arm: number;        // in cm
+  arm?: number;       // in cm (legacy)
+  armLeft: number;    // left arm in cm
+  armRight: number;   // right arm in cm
   createdAt: string;  // ISO timestamp
 }
 

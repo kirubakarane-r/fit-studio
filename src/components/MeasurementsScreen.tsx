@@ -1,5 +1,5 @@
 import React, { createElement, useState, useEffect, Fragment } from 'react';
-import { Ruler, Scale, Calendar, Plus, X, Trash2, TrendingUp, TrendingDown, Minus, Check } from 'lucide-react';
+import { Ruler, Scale, Calendar, Plus, X, Trash2, TrendingUp, TrendingDown, Minus, Check, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useAuth } from '../context/AuthContext';
 import { formatDateFull } from '../utils/formatters';
@@ -18,7 +18,9 @@ export default function MeasurementsScreen() {
   const [weight, setWeight] = useState('');
   const [waist, setWaist] = useState('');
   const [chest, setChest] = useState('');
-  const [arm, setArm] = useState('');
+  const [armLeft, setArmLeft] = useState('');
+  const [armRight, setArmRight] = useState('');
+  const [weekOffset, setWeekOffset] = useState<number>(0);
 
   const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -31,7 +33,8 @@ export default function MeasurementsScreen() {
       setWeight(existing.weight.toString());
       setWaist(existing.waist.toString());
       setChest(existing.chest.toString());
-      setArm(existing.arm.toString());
+      setArmLeft(existing.armLeft.toString());
+      setArmRight(existing.armRight.toString());
     } else {
       // Pre-fill from latest if logging a new entry to save manual typing
       const latest = measurements[0];
@@ -39,12 +42,14 @@ export default function MeasurementsScreen() {
         setWeight(latest.weight.toString());
         setWaist(latest.waist.toString());
         setChest(latest.chest.toString());
-        setArm(latest.arm.toString());
+        setArmLeft(latest.armLeft.toString());
+        setArmRight(latest.armRight.toString());
       } else {
         setWeight('');
         setWaist('');
         setChest('');
-        setArm('');
+        setArmLeft('');
+        setArmRight('');
       }
     }
   }, [date, measurements]);
@@ -57,15 +62,16 @@ export default function MeasurementsScreen() {
     const wNum = parseFloat(weight);
     const waNum = parseFloat(waist);
     const cNum = parseFloat(chest);
-    const aNum = parseFloat(arm);
+    const alNum = parseFloat(armLeft);
+    const arNum = parseFloat(armRight);
 
-    if (isNaN(wNum) || isNaN(waNum) || isNaN(cNum) || isNaN(aNum)) {
+    if (isNaN(wNum) || isNaN(waNum) || isNaN(cNum) || isNaN(alNum) || isNaN(arNum)) {
       setError('Please fill in all measurements with valid numbers.');
       return;
     }
 
     try {
-      await handleSaveMeasurement(date, wNum, waNum, cNum, aNum);
+      await handleSaveMeasurement(date, wNum, waNum, cNum, alNum, arNum);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
       setShowForm(false);
@@ -85,17 +91,17 @@ export default function MeasurementsScreen() {
   // --------------------------------------------------
   const today = new Date();
   
-  // Calculate current week's Sunday
-  const currentSunday = new Date(today);
-  currentSunday.setDate(today.getDate() - today.getDay());
-  currentSunday.setHours(0, 0, 0, 0);
+  // Calculate active week's Sunday based on weekOffset
+  const selectedSunday = new Date(today);
+  selectedSunday.setDate(today.getDate() - today.getDay() + (weekOffset * 7));
+  selectedSunday.setHours(0, 0, 0, 0);
 
-  // Calculate last week's Sunday
-  const lastSunday = new Date(currentSunday);
+  // Calculate last week's Sunday relative to selectedSunday
+  const lastSunday = new Date(selectedSunday);
   lastSunday.setDate(lastSunday.getDate() - 7);
 
   // Next week's Sunday (for bounds checking)
-  const nextSunday = new Date(currentSunday);
+  const nextSunday = new Date(selectedSunday);
   nextSunday.setDate(nextSunday.getDate() + 7);
 
   const getLocalDateString = (d: Date) => {
@@ -104,13 +110,13 @@ export default function MeasurementsScreen() {
     return localDate.toISOString().split('T')[0];
   };
 
-  const currentSundayStr = getLocalDateString(currentSunday);
+  const selectedSundayStr = getLocalDateString(selectedSunday);
   const nextSundayStr = getLocalDateString(nextSunday);
   const lastSundayStr = getLocalDateString(lastSunday);
 
-  // Find latest entry for current calendar week and last calendar week
-  const currentWeekEntry = measurements.find(m => m.date >= currentSundayStr && m.date < nextSundayStr);
-  const lastWeekEntry = measurements.find(m => m.date >= lastSundayStr && m.date < currentSundayStr);
+  // Find latest entry for selected calendar week and last calendar week
+  const currentWeekEntry = measurements.find(m => m.date >= selectedSundayStr && m.date < nextSundayStr);
+  const lastWeekEntry = measurements.find(m => m.date >= lastSundayStr && m.date < selectedSundayStr);
 
   const formatDateRange = (start: Date) => {
     const end = new Date(start);
@@ -119,7 +125,7 @@ export default function MeasurementsScreen() {
     return `${format(start)} - ${format(end)}`;
   };
 
-  const getTrendData = (metric: 'weight' | 'waist' | 'chest' | 'arm', current: number, past: number) => {
+  const getTrendData = (metric: 'weight' | 'waist' | 'chest' | 'armLeft' | 'armRight', current: number, past: number) => {
     const diff = current - past;
     if (past === 0) return { text: 'New', color: 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20', icon: Plus };
     if (Math.abs(diff) < 0.01) return { text: '0.0', color: 'text-neutral-500 bg-neutral-800 border border-neutral-700/30', icon: Minus };
@@ -132,7 +138,7 @@ export default function MeasurementsScreen() {
       isGood = isMuscle ? diff > 0 : diff < 0;
     } else if (metric === 'waist') {
       isGood = diff < 0;
-    } else { // chest, arm
+    } else { // chest, armLeft, armRight
       isGood = diff > 0;
     }
 
@@ -145,16 +151,18 @@ export default function MeasurementsScreen() {
 
   const renderComparisonCard = (
     title: string,
-    metric: 'weight' | 'waist' | 'chest' | 'arm',
+    metric: 'weight' | 'waist' | 'chest' | 'armLeft' | 'armRight',
     Icon: any,
-    unit: string
+    unit: string,
+    extraClass?: string
   ) => {
     const currentVal = currentWeekEntry ? currentWeekEntry[metric] : null;
     const pastVal = lastWeekEntry ? lastWeekEntry[metric] : null;
 
     let valueDisplay = '-';
-    let pastDisplay = 'No entry';
+    let pastDisplay = '';
     let trendTag = null;
+    let showComparison = false;
 
     if (currentVal !== null) {
       valueDisplay = `${currentVal.toFixed(1)} ${unit}`;
@@ -167,25 +175,21 @@ export default function MeasurementsScreen() {
           createElement(trend.icon, { className: 'w-3 h-3' }),
           createElement('span', null, trend.text)
         );
-      } else {
-        trendTag = createElement(
-          'div',
-          { className: 'text-[9px] font-bold text-neutral-500 bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded-lg' },
-          'No comparison'
-        );
+        showComparison = true;
       }
     } else {
-      // If current week is missing, check if we can display the latest entry ever as a fallback
+      // If selected week is missing, check if we can display the latest entry ever as a fallback
       const latestEntry = measurements[0];
-      if (latestEntry) {
+      if (latestEntry && latestEntry[metric] !== undefined) {
         valueDisplay = `${latestEntry[metric].toFixed(1)} ${unit}`;
         pastDisplay = `Logged ${formatDateShort(latestEntry.date)}`;
+        showComparison = true;
       }
     }
 
     return createElement(
       'div',
-      { className: 'bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-neutral-700 transition-colors' },
+      { className: `bg-[#121212] border border-neutral-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-neutral-700 transition-colors ${extraClass || ''}` },
       createElement(
         'div',
         { className: 'flex justify-between items-start w-full' },
@@ -201,13 +205,13 @@ export default function MeasurementsScreen() {
         { className: 'mt-4 flex items-baseline gap-1' },
         createElement('span', { className: 'text-2xl font-extrabold text-neutral-100 tracking-tight' }, valueDisplay)
       ),
-      createElement(
+      showComparison && createElement(
         'div',
         { className: 'mt-2 flex justify-between items-center w-full border-t border-neutral-900 pt-2' },
         createElement(
           'div',
           { className: 'flex flex-col' },
-          createElement('span', { className: 'text-[9px] text-neutral-500 uppercase font-semibold' }, 'Last Week'),
+          createElement('span', { className: 'text-[9px] text-neutral-500 uppercase font-semibold' }, currentVal === null ? 'Last Logged' : 'Last Week'),
           createElement('span', { className: 'text-xs text-neutral-300 font-bold mt-0.5' }, pastDisplay)
         ),
         trendTag
@@ -341,15 +345,30 @@ export default function MeasurementsScreen() {
           createElement(
             'div',
             null,
-            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Arm (cm)'),
+            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Left Arm (cm)'),
             createElement('input', {
               type: 'number',
               step: '0.1',
               required: true,
               min: '0',
               placeholder: 'e.g. 36.5',
-              value: arm,
-              onChange: (e: any) => setArm(e.target.value),
+              value: armLeft,
+              onChange: (e: any) => setArmLeft(e.target.value),
+              className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
+            })
+          ),
+          createElement(
+            'div',
+            null,
+            createElement('label', { className: 'text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5' }, 'Right Arm (cm)'),
+            createElement('input', {
+              type: 'number',
+              step: '0.1',
+              required: true,
+              min: '0',
+              placeholder: 'e.g. 36.5',
+              value: armRight,
+              onChange: (e: any) => setArmRight(e.target.value),
               className: 'w-full bg-neutral-950/50 border border-neutral-900 focus:border-emerald-500 text-sm rounded-xl px-3 py-2.5 text-neutral-200 focus:outline-none'
             })
           )
@@ -366,78 +385,53 @@ export default function MeasurementsScreen() {
       )
     ),
 
-    // Weekly Summary Label Card
+    // Week Offset Picker
     createElement(
       'div',
-      { className: 'bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-4.5 flex flex-col sm:flex-row justify-between sm:items-center shadow-lg gap-2' },
+      { className: 'flex justify-between items-center bg-[#121212]/80 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-3 shadow-xl' },
+      createElement('button', { onClick: () => setWeekOffset(prev => prev - 1), className: 'p-2 hover:bg-neutral-800 rounded-lg cursor-pointer' }, createElement(ChevronLeft, { className: 'w-5 h-5 text-neutral-400' })),
       createElement(
         'div',
-        { className: 'flex flex-col' },
-        createElement('span', { className: 'text-[9px] text-neutral-500 uppercase tracking-widest font-black' }, 'Current Week Schedule'),
-        createElement('span', { className: 'text-sm font-bold text-neutral-200 mt-0.5' }, formatDateRange(currentSunday))
+        { className: 'flex items-center gap-2' },
+        createElement('span', { className: 'font-bold text-sm text-neutral-200' }, weekOffset === 0 ? 'Current Week' : formatDateRange(selectedSunday)),
+        currentWeekEntry && createElement(
+          'div',
+          { className: 'flex items-center gap-1.5 ml-2 border-l border-neutral-800/80 pl-2' },
+          createElement(
+            'button',
+            {
+              onClick: () => {
+                setDate(currentWeekEntry.date);
+                setShowForm(true);
+              },
+              className: 'p-1 hover:bg-neutral-800 rounded-md text-neutral-400 hover:text-emerald-400 cursor-pointer transition-colors flex items-center justify-center',
+              title: 'Edit measurement'
+            },
+            createElement(Edit2, { className: 'w-3.5 h-3.5' })
+          ),
+          createElement(
+            'button',
+            {
+              onClick: () => handleDelete(currentWeekEntry.id),
+              className: 'p-1 hover:bg-neutral-800 rounded-md text-neutral-400 hover:text-red-400 cursor-pointer transition-colors flex items-center justify-center',
+              title: 'Delete measurement'
+            },
+            createElement(Trash2, { className: 'w-3.5 h-3.5' })
+          )
+        )
       ),
-      createElement(
-        'div',
-        { className: 'text-xs text-neutral-400 font-medium' },
-        currentWeekEntry 
-          ? createElement('span', { className: 'text-emerald-400 font-bold flex items-center gap-1' }, createElement(Check, { className: 'w-4 h-4' }), 'Weekly measurement logged')
-          : '⚠️ Measurement pending for this Sunday'
-      )
+      createElement('button', { onClick: () => setWeekOffset(prev => prev + 1), disabled: weekOffset >= 0, className: `p-2 rounded-lg ${weekOffset >= 0 ? 'opacity-50' : 'hover:bg-neutral-800 cursor-pointer'}` }, createElement(ChevronRight, { className: 'w-5 h-5 text-neutral-400' }))
     ),
 
     // Comparison Grid
     createElement(
       'div',
       { className: 'grid grid-cols-2 gap-3.5' },
-      renderComparisonCard('Body Weight', 'weight', Scale, 'kg'),
+      renderComparisonCard('Body Weight', 'weight', Scale, 'kg', 'col-span-2'),
       renderComparisonCard('Waist Size', 'waist', Ruler, 'cm'),
       renderComparisonCard('Chest Size', 'chest', Ruler, 'cm'),
-      renderComparisonCard('Arm Size', 'arm', Ruler, 'cm')
-    ),
-
-    // History Log
-    createElement(
-      'div',
-      { className: 'space-y-3' },
-      createElement('h3', { className: 'text-xs font-bold text-neutral-400 uppercase tracking-wider pl-1' }, 'Measurement History'),
-      
-      measurements.length === 0
-        ? createElement(
-            'div',
-            { className: 'text-center py-10 border border-dashed border-neutral-850 bg-neutral-900/10 rounded-2xl text-neutral-500 text-xs font-medium' },
-            'No physical measurements saved yet.'
-          )
-        : createElement(
-            'div',
-            { className: 'space-y-2' },
-            measurements.map(m =>
-              createElement(
-                'div',
-                { key: m.id, className: 'bg-[#121212] border border-neutral-800/80 rounded-2xl p-4 flex justify-between items-center shadow-sm hover:border-neutral-700 transition-colors' },
-                createElement(
-                  'div',
-                  { className: 'space-y-1' },
-                  createElement('h4', { className: 'text-xs font-bold text-neutral-300' }, formatDateFull(m.date)),
-                  createElement(
-                    'div',
-                    { className: 'flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-neutral-400 font-mono font-medium' },
-                    createElement('span', null, `Wt: ${m.weight.toFixed(1)}kg`),
-                    createElement('span', null, `Wst: ${m.waist.toFixed(1)}cm`),
-                    createElement('span', null, `Cst: ${m.chest.toFixed(1)}cm`),
-                    createElement('span', null, `Arm: ${m.arm.toFixed(1)}cm`)
-                  )
-                ),
-                createElement(
-                  'button',
-                  {
-                    onClick: () => handleDelete(m.id),
-                    className: 'p-2 text-neutral-500 hover:text-red-400 rounded-lg cursor-pointer hover:bg-neutral-900 transition-colors'
-                  },
-                  createElement(Trash2, { className: 'w-4 h-4' })
-                )
-              )
-            )
-          )
+      renderComparisonCard('Left Arm Size', 'armLeft', Ruler, 'cm'),
+      renderComparisonCard('Right Arm Size', 'armRight', Ruler, 'cm')
     )
   );
 }
