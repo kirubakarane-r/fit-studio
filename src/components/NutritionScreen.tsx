@@ -1,60 +1,10 @@
 import React, { createElement, useMemo } from 'react';
 import { Apple, Plus, Activity, Droplet, Wheat, ChevronLeft, ChevronRight, Calendar, Edit2, Trash2 } from 'lucide-react';
 import { useNutrition } from '../context/NutritionContext';
-import { useAuth } from '../context/AuthContext';
 import { MealEntry } from '../types';
 
 export default function NutritionScreen() {
   const { meals, target, loading, selectedDate, setSelectedDate, setActiveMealType, setShowAddFoodModal, setShowEditTargetModal, handleDeleteMealEntry, handleUpdateMealEntry, foods } = useNutrition();
-  const { user } = useAuth();
-  const [isFixing, setIsFixing] = React.useState(false);
-
-  const handleFixFiber = async () => {
-    if (!user) return;
-    setIsFixing(true);
-    try {
-      const { doc, setDoc } = await import('firebase/firestore');
-      const { db } = await import('../firebase');
-      const { fetchFoodMacros } = await import('../utils/gemini');
-
-      const updatedFiberMap = new Map<string, number>();
-
-      for (const food of foods) {
-        if (food.fiber === undefined) {
-          const [amount, ...unitParts] = food.servingSize.split(' ');
-          const unit = unitParts.join(' ');
-          let estimatedFiber = 0;
-          try {
-            const macros = await fetchFoodMacros(food.name, amount, unit || 'grams', food.cookingDetails, food.image);
-            estimatedFiber = macros.fiber || 0;
-          } catch (e) {
-            console.error("Failed to fetch for", food.name, e);
-          }
-          
-          const updatedFood = { ...food, fiber: estimatedFiber };
-          await setDoc(doc(db, 'users', user.uid, 'foods', food.id), updatedFood);
-          updatedFiberMap.set(food.id, estimatedFiber);
-        } else {
-          updatedFiberMap.set(food.id, food.fiber);
-        }
-      }
-
-      for (const meal of meals) {
-        if (meal.fiber === undefined) {
-          const baseFiber = updatedFiberMap.get(meal.foodId) || 0;
-          const mealFiber = baseFiber * meal.servings;
-          
-          const updatedMeal = { ...meal, fiber: mealFiber };
-          await setDoc(doc(db, 'users', user.uid, 'meals', meal.id), updatedMeal);
-        }
-      }
-      alert("Fiber data backfilled successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fix fiber data");
-    }
-    setIsFixing(false);
-  };
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -247,22 +197,13 @@ export default function NutritionScreen() {
           <h2 className="text-base font-extrabold text-neutral-200 uppercase tracking-wider">
             Daily Summary
           </h2>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleFixFiber}
-              disabled={isFixing}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
-            >
-              {isFixing ? 'Fixing...' : 'Fix Fiber'}
-            </button>
-            <button 
-              onClick={() => setShowEditTargetModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              Edit Goals
-            </button>
-          </div>
+          <button 
+            onClick={() => setShowEditTargetModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            Edit Goals
+          </button>
         </div>
         
         <div className="flex justify-between items-center mb-8">
