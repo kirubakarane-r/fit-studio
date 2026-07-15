@@ -1,5 +1,5 @@
-import { createElement } from 'react';
-import { X, Play, Pencil } from 'lucide-react';
+import { createElement, useState } from 'react';
+import { X, Play, Pencil, GripVertical } from 'lucide-react';
 import { useWorkout } from '../context/WorkoutContext';
 
 export default function TemplateDetailModal() {
@@ -9,7 +9,8 @@ export default function TemplateDetailModal() {
     exercises,
     handleStartWorkoutFromTemplate,
     setEditingTemplate,
-    setShowCreatePlanModal
+    setShowCreatePlanModal,
+    handleUpdatePlan
   } = useWorkout();
 
   if (!selectedTemplateToView) return null;
@@ -21,6 +22,44 @@ export default function TemplateDetailModal() {
   const handleStart = () => {
     handleStartWorkoutFromTemplate(selectedTemplateToView);
     setSelectedTemplateToView(null);
+  };
+
+  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+  const handleDragStart = (e: any, idx: number) => {
+    setDraggedIdx(idx);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: any, idx: number) => {
+    e.preventDefault();
+    if (draggedIdx === null || draggedIdx === idx) return;
+    setDragOverIdx(idx);
+  };
+
+  const handleDragLeave = (e: any) => {
+    e.preventDefault();
+    setDragOverIdx(null);
+  };
+
+  const handleDrop = async (e: any, targetIdx: number) => {
+    e.preventDefault();
+    setDragOverIdx(null);
+    if (draggedIdx === null || draggedIdx === targetIdx || !selectedTemplateToView) {
+      setDraggedIdx(null);
+      return;
+    }
+
+    const newExercises = [...selectedTemplateToView.exercises];
+    const item = newExercises.splice(draggedIdx, 1)[0];
+    newExercises.splice(targetIdx, 0, item);
+
+    const updatedTemplate = { ...selectedTemplateToView, exercises: newExercises };
+    setSelectedTemplateToView(updatedTemplate);
+    setDraggedIdx(null);
+    
+    await handleUpdatePlan(updatedTemplate.name, updatedTemplate.name, newExercises);
   };
 
   return createElement(
@@ -79,16 +118,31 @@ export default function TemplateDetailModal() {
               { className: 'text-center py-6 text-sm text-neutral-500' },
               'No exercises in this plan.'
             )
-          : tplExercises.map((ex, idx) =>
-              createElement(
+          : tplExercises.map((ex, idx) => {
+              const isDragging = draggedIdx === idx;
+              const isDragOver = dragOverIdx === idx;
+              
+              return createElement(
                 'div',
                 {
                   key: `${ex?.id}-${idx}`,
-                  className: 'bg-neutral-900/40 border border-neutral-800/80 p-3 rounded-2xl flex items-center justify-between'
+                  draggable: true,
+                  onDragStart: (e: any) => handleDragStart(e, idx),
+                  onDragOver: (e: any) => handleDragOver(e, idx),
+                  onDragLeave: handleDragLeave,
+                  onDrop: (e: any) => handleDrop(e, idx),
+                  className: `bg-neutral-900/40 border p-3 rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing transition-all ${
+                    isDragging ? 'opacity-40 border-emerald-500/50' : isDragOver ? 'border-emerald-400 border-dashed scale-[1.02]' : 'border-neutral-800/80'
+                  }`
                 },
                 createElement(
                   'div',
                   { className: 'flex items-center gap-3' },
+                  createElement(
+                    'div',
+                    { className: 'text-neutral-500 cursor-grab hover:text-neutral-300' },
+                    createElement(GripVertical, { className: 'w-4 h-4' })
+                  ),
                   createElement(
                     'div',
                     { className: 'w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-400' },
@@ -101,8 +155,8 @@ export default function TemplateDetailModal() {
                     createElement('span', { className: 'text-xs text-neutral-500 capitalize' }, ex?.muscle)
                   )
                 )
-              )
-            )
+              );
+            })
       ),
 
       // Footer

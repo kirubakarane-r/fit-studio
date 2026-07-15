@@ -56,6 +56,7 @@ export default function ActiveWorkoutScreen() {
         const exData = exercises.find(e => e.id === ex.id);
         const isCardio = exData?.type === 'cardio';
         const isBW = exData?.type === 'bodyweight';
+        const isTimed = exData?.type === 'timed';
 
         return createElement(
           'div',
@@ -136,6 +137,19 @@ export default function ActiveWorkoutScreen() {
                   }),
                   createElement('span', { className: 'text-[10px] text-neutral-500 font-medium font-mono' }, 'reps')
                 );
+              } else if (isTimed) {
+                inputsContent = createElement(
+                  'div',
+                  { className: 'flex items-center gap-1.5 bg-neutral-900/80 border border-neutral-800 px-2.5 py-1.5 rounded-lg focus-within:border-emerald-500' },
+                  createElement('input', {
+                    type: 'number',
+                    placeholder: 'Time',
+                    value: set.weight,
+                    onChange: (e: any) => handleUpdateSet(exIndex, setIndex, 'weight', e.target.value),
+                    className: 'w-full bg-transparent border-none text-xs text-neutral-200 font-mono focus:outline-none'
+                  }),
+                  createElement('span', { className: 'text-[10px] text-neutral-500 font-medium font-mono' }, 'sec')
+                );
               } else {
                 inputsContent = createElement(
                   Fragment,
@@ -163,15 +177,29 @@ export default function ActiveWorkoutScreen() {
                       className: 'w-full bg-transparent border-none text-xs text-neutral-200 font-mono focus:outline-none'
                     }),
                     createElement('span', { className: 'text-[10px] text-neutral-500 font-medium font-mono' }, 'reps')
+                  ),
+                  createElement(
+                    'div',
+                    { className: 'flex items-center gap-1.5 bg-neutral-900/80 border border-neutral-800 px-2.5 py-1.5 rounded-lg focus-within:border-emerald-500' },
+                    createElement('input', {
+                      type: 'number',
+                      placeholder: 'RIR',
+                      value: set.rir || '',
+                      onChange: (e: any) => handleUpdateSet(exIndex, setIndex, 'rir', e.target.value),
+                      className: 'w-full bg-transparent border-none text-xs text-neutral-200 font-mono focus:outline-none'
+                    }),
+                    createElement('span', { className: 'text-[10px] text-neutral-500 font-medium font-mono' }, 'rir')
                   )
                 );
               }
 
               const hasInputs = isBW 
                 ? String(set.reps).trim() !== ''
-                : isCardio 
-                  ? String(set.weight).trim() !== '' && String(set.reps).trim() !== ''
-                  : String(set.weight).trim() !== '' && String(set.reps).trim() !== '';
+                : isTimed
+                  ? String(set.weight).trim() !== ''
+                  : isCardio 
+                    ? String(set.weight).trim() !== '' && String(set.reps).trim() !== ''
+                    : String(set.weight).trim() !== '' && String(set.reps).trim() !== '';
               
               const isDisabled = set.done || !hasInputs;
 
@@ -183,11 +211,11 @@ export default function ActiveWorkoutScreen() {
                     set.done ? 'bg-emerald-950/10' : 'bg-transparent'
                   }`,
                   style: {
-                    gridTemplateColumns: isBW 
+                    gridTemplateColumns: (isBW || isTimed)
                       ? '30px 1fr 40px' 
                       : isCardio 
                         ? '30px 1fr 1fr 40px' 
-                        : '30px 1fr 1fr 40px'
+                        : '30px 1fr 1fr 1fr 40px'
                   }
                 },
                 createElement(

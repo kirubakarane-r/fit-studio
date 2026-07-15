@@ -283,9 +283,6 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     localStorage.setItem('activeWorkout', activeWorkout ? JSON.stringify(activeWorkout) : '');
-    if (activeWorkout) {
-      setScreen('active');
-    }
   }, [activeWorkout]);
 
   // --------------------------------------------------
@@ -430,11 +427,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // NAVIGATION ROUTER GUARD
   // --------------------------------------------------
   const navigateTo = (target: 'home' | 'history' | 'progress' | 'exercises' | 'active' | 'nutrition' | 'measurements') => {
-    if (activeWorkout) {
-      setScreen('active');
-    } else {
-      setScreen(target);
-    }
+    setScreen(target);
   };
 
   // --------------------------------------------------
@@ -829,6 +822,8 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
               else if (wt === currentPR.weight && rp > currentPR.reps) isNewPR = true;
             } else if (exData.type === 'bodyweight') {
               if (rp > currentPR.reps) isNewPR = true;
+            } else if (exData.type === 'timed') {
+              if (wt > currentPR.weight) isNewPR = true;
             } else if (exData.type === 'cardio') {
               if (rp > currentPR.reps) isNewPR = true;
               else if (rp === currentPR.reps && wt > currentPR.weight) isNewPR = true;

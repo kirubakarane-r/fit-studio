@@ -94,7 +94,8 @@ export default function CreateExerciseModal() {
             },
             createElement('option', { value: 'weight' }, 'Weighted (Weight + Reps)'),
             createElement('option', { value: 'bodyweight' }, 'Bodyweight (Reps Only)'),
-            createElement('option', { value: 'cardio' }, 'Cardio (Time + Distance)')
+            createElement('option', { value: 'cardio' }, 'Cardio (Time + Distance)'),
+            createElement('option', { value: 'timed' }, 'Timed (Time in seconds)')
           )
         ),
 

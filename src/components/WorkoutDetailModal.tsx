@@ -78,6 +78,7 @@ export default function WorkoutDetailModal() {
     const exData = exercises.find(e => e.id === ex.id);
     const isCardio = exData?.type === 'cardio';
     const isBW = exData?.type === 'bodyweight';
+    const isTimed = exData?.type === 'timed';
 
     return createElement(
       'div',
@@ -120,9 +121,11 @@ export default function WorkoutDetailModal() {
                 { className: 'font-mono font-medium' },
                 isCardio
                   ? createElement('span', null, `${set.weight || '0'} min • ${set.reps || '0'} km`)
-                  : isBW
-                    ? createElement('span', null, `${set.reps || '0'} reps`)
-                    : createElement('span', null, `${set.weight || '0'}kg × ${set.reps || '0'} reps`)
+                  : isTimed
+                    ? createElement('span', null, `${set.weight || '0'} sec`)
+                    : isBW
+                      ? createElement('span', null, `${set.reps || '0'} reps`)
+                      : createElement('span', null, `${set.weight || '0'}kg × ${set.reps || '0'} reps`)
               )
             );
           } else {
@@ -147,6 +150,14 @@ export default function WorkoutDetailModal() {
                   className: 'w-16 bg-neutral-900 border border-neutral-850 rounded p-1 text-xs text-center text-neutral-200 font-mono'
                 })
               );
+            } else if (isTimed) {
+              editInputs = createElement('input', {
+                type: 'number',
+                placeholder: 'sec',
+                value: set.weight,
+                onChange: (e: any) => handleUpdateDraftSet(exIdx, setIdx, 'weight', e.target.value),
+                className: 'w-20 bg-neutral-900 border border-neutral-850 rounded p-1 text-xs text-center text-neutral-200 font-mono'
+              });
             } else if (isBW) {
               editInputs = createElement('input', {
                 type: 'number',

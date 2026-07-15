@@ -145,7 +145,7 @@ export const COMPREHENSIVE_EXERCISES: Exercise[] = [
   { id: 'co12', name: 'Side Bend', muscle: 'core', type: 'weight' },
   { id: 'co13', name: 'Bicycle Crunch', muscle: 'core', type: 'bodyweight' },
   { id: 'co14', name: 'Windshield Wipers', muscle: 'core', type: 'bodyweight' },
-  { id: 'co15', name: 'Plank', muscle: 'core', type: 'bodyweight' },
+  { id: 'co15', name: 'Plank', muscle: 'core', type: 'timed' },
   { id: 'co16', name: 'Side Plank', muscle: 'core', type: 'bodyweight' },
   { id: 'co17', name: 'Ab Wheel Rollout', muscle: 'core', type: 'bodyweight' },
   { id: 'co18', name: 'Dead Bug', muscle: 'core', type: 'bodyweight' },

@@ -3,7 +3,7 @@ import { Dumbbell, History, Ruler, TrendingUp, BookOpen, Apple } from 'lucide-re
 import { useWorkout } from '../context/WorkoutContext';
 
 export default function BottomNav() {
-  const { screen, navigateTo } = useWorkout();
+  const { screen, navigateTo, activeWorkout } = useWorkout();
 
   return createElement(
     'nav',
@@ -16,13 +16,13 @@ export default function BottomNav() {
       createElement(
         'button',
         {
-          onClick: () => navigateTo('home'),
+          onClick: () => navigateTo(activeWorkout ? 'active' : 'home'),
           className: `flex-1 flex flex-col items-center justify-center gap-1 h-full text-[10px] font-bold tracking-tight cursor-pointer ${
             screen === 'home' || screen === 'active' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-300'
           }`
         },
         createElement(Dumbbell, { className: 'w-5 h-5' }),
-        createElement('span', null, 'Home')
+        createElement('span', null, activeWorkout ? 'Workout' : 'Home')
       ),
 
       // History button

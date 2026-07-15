@@ -9,6 +9,7 @@ export default function EditTargetModal() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [fiber, setFiber] = useState('');
 
   useEffect(() => {
     if (showEditTargetModal) {
@@ -16,6 +17,7 @@ export default function EditTargetModal() {
       setProtein(target.protein.toString());
       setCarbs(target.carbs.toString());
       setFat(target.fat.toString());
+      setFiber((target.fiber || 30).toString());
     }
   }, [showEditTargetModal, target]);
 
@@ -29,7 +31,8 @@ export default function EditTargetModal() {
       calories: parseInt(calories),
       protein: parseInt(protein),
       carbs: parseInt(carbs),
-      fat: parseInt(fat)
+      fat: parseInt(fat),
+      fiber: parseInt(fiber) || 30
     });
     
     setShowEditTargetModal(false);
@@ -75,7 +78,7 @@ export default function EditTargetModal() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-2">Protein (g)</label>
                   <input
@@ -109,6 +112,18 @@ export default function EditTargetModal() {
                     value={fat}
                     onChange={(e) => setFat(e.target.value)}
                     className="w-full bg-neutral-900 border border-neutral-800 focus:border-rose-500 text-sm rounded-xl px-3 py-3 text-neutral-100 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-2">Fiber (g)</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={fiber}
+                    onChange={(e) => setFiber(e.target.value)}
+                    className="w-full bg-neutral-900 border border-neutral-800 focus:border-emerald-500 text-sm rounded-xl px-3 py-3 text-neutral-100 focus:outline-none"
                   />
                 </div>
               </div>

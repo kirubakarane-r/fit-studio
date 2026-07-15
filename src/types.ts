@@ -2,7 +2,7 @@ export interface Exercise {
   id: string;
   name: string;
   muscle: 'chest' | 'back' | 'legs' | 'shoulders' | 'arms' | 'core' | 'cardio';
-  type: 'weight' | 'bodyweight' | 'cardio';
+  type: 'weight' | 'bodyweight' | 'cardio' | 'timed';
 }
 
 export interface Template {
@@ -13,6 +13,7 @@ export interface Template {
 export interface WorkoutSet {
   weight: string; // Keep as string for input handling, parse when calculating
   reps: string;   // Keep as string for input handling, parse when calculating
+  rir?: string;   // Reps in reserve
   done: boolean;
 }
 
@@ -38,6 +39,7 @@ export interface FoodItem {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
   servingSize: string;
   cookingDetails?: string;
   image?: string;
@@ -53,6 +55,7 @@ export interface MealEntry {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
   servings: number;
   mealType: MealType;
   date: string;
@@ -63,6 +66,7 @@ export interface DailyNutritionTarget {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
 }
 
 export interface BodyMeasurement {

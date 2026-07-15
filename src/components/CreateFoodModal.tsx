@@ -68,6 +68,7 @@ export default function CreateFoodModal() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [fiber, setFiber] = useState('');
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [macrosGenerated, setMacrosGenerated] = useState(false);
@@ -87,6 +88,7 @@ export default function CreateFoodModal() {
         setProtein(String(editingFood.protein));
         setCarbs(String(editingFood.carbs));
         setFat(String(editingFood.fat));
+        setFiber(String(editingFood.fiber || 0));
         setCookingDetails(editingFood.cookingDetails || '');
         setImageBase64(editingFood.image || null);
         setMacrosGenerated(true);
@@ -98,6 +100,7 @@ export default function CreateFoodModal() {
         setProtein('');
         setCarbs('');
         setFat('');
+        setFiber('');
         setCookingDetails('');
         setImageBase64(null);
         setMacrosGenerated(false);
@@ -126,6 +129,7 @@ export default function CreateFoodModal() {
       setProtein(String(Math.round(data.protein * 10) / 10));
       setCarbs(String(Math.round(data.carbs * 10) / 10));
       setFat(String(Math.round(data.fat * 10) / 10));
+      setFiber(String(Math.round((data.fiber || 0) * 10) / 10));
       
       setMacrosGenerated(true);
     } catch (error: any) {
@@ -146,6 +150,7 @@ export default function CreateFoodModal() {
       protein: parseFloat(protein),
       carbs: parseFloat(carbs),
       fat: parseFloat(fat),
+      fiber: parseFloat(fiber || '0'),
       servingSize: `${servingAmount} ${servingUnit}`
     };
 
@@ -365,6 +370,14 @@ export default function CreateFoodModal() {
                   <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Fat (g)</label>
                   <div className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-rose-400 font-bold">
                     {fat || '-'} g
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Fiber (g)</label>
+                  <div className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-emerald-400 font-bold">
+                    {fiber || '-'} g
                   </div>
                 </div>
               </div>

@@ -1,10 +1,60 @@
 import React, { createElement, useMemo } from 'react';
 import { Apple, Plus, Activity, Droplet, Wheat, ChevronLeft, ChevronRight, Calendar, Edit2, Trash2 } from 'lucide-react';
 import { useNutrition } from '../context/NutritionContext';
+import { useAuth } from '../context/AuthContext';
 import { MealEntry } from '../types';
 
 export default function NutritionScreen() {
   const { meals, target, loading, selectedDate, setSelectedDate, setActiveMealType, setShowAddFoodModal, setShowEditTargetModal, handleDeleteMealEntry, handleUpdateMealEntry, foods } = useNutrition();
+  const { user } = useAuth();
+  const [isFixing, setIsFixing] = React.useState(false);
+
+  const handleFixFiber = async () => {
+    if (!user) return;
+    setIsFixing(true);
+    try {
+      const { doc, setDoc } = await import('firebase/firestore');
+      const { db } = await import('../firebase');
+      const { fetchFoodMacros } = await import('../utils/gemini');
+
+      const updatedFiberMap = new Map<string, number>();
+
+      for (const food of foods) {
+        if (food.fiber === undefined) {
+          const [amount, ...unitParts] = food.servingSize.split(' ');
+          const unit = unitParts.join(' ');
+          let estimatedFiber = 0;
+          try {
+            const macros = await fetchFoodMacros(food.name, amount, unit || 'grams', food.cookingDetails, food.image);
+            estimatedFiber = macros.fiber || 0;
+          } catch (e) {
+            console.error("Failed to fetch for", food.name, e);
+          }
+          
+          const updatedFood = { ...food, fiber: estimatedFiber };
+          await setDoc(doc(db, 'users', user.uid, 'foods', food.id), updatedFood);
+          updatedFiberMap.set(food.id, estimatedFiber);
+        } else {
+          updatedFiberMap.set(food.id, food.fiber);
+        }
+      }
+
+      for (const meal of meals) {
+        if (meal.fiber === undefined) {
+          const baseFiber = updatedFiberMap.get(meal.foodId) || 0;
+          const mealFiber = baseFiber * meal.servings;
+          
+          const updatedMeal = { ...meal, fiber: mealFiber };
+          await setDoc(doc(db, 'users', user.uid, 'meals', meal.id), updatedMeal);
+        }
+      }
+      alert("Fiber data backfilled successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fix fiber data");
+    }
+    setIsFixing(false);
+  };
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -32,8 +82,9 @@ export default function NutritionScreen() {
       acc.protein += m.protein;
       acc.carbs += m.carbs;
       acc.fat += m.fat;
+      acc.fiber += m.fiber || 0;
       return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    }, { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
   }, [todaysMeals]);
 
   const mealGroups = useMemo(() => {
@@ -109,7 +160,7 @@ export default function NutritionScreen() {
                     <div className="text-right flex flex-col">
                       <span className="text-sm font-bold text-neutral-300">{Math.round(item.calories)} kcal</span>
                       <span className="text-[10px] text-neutral-500 uppercase font-black">
-                        P: {Math.round(item.protein)} C: {Math.round(item.carbs)} F: {Math.round(item.fat)}
+                        P: {Math.round(item.protein)} C: {Math.round(item.carbs)} F: {Math.round(item.fat)} Fib: {Math.round(item.fiber || 0)}
                       </span>
                     </div>
                     <div className="flex items-center -mr-2">
@@ -196,13 +247,22 @@ export default function NutritionScreen() {
           <h2 className="text-base font-extrabold text-neutral-200 uppercase tracking-wider">
             Daily Summary
           </h2>
-          <button 
-            onClick={() => setShowEditTargetModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
-          >
-            <Edit2 className="w-3.5 h-3.5" />
-            Edit Goals
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleFixFiber}
+              disabled={isFixing}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
+            >
+              {isFixing ? 'Fixing...' : 'Fix Fiber'}
+            </button>
+            <button 
+              onClick={() => setShowEditTargetModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+              Edit Goals
+            </button>
+          </div>
         </div>
         
         <div className="flex justify-between items-center mb-8">
@@ -232,6 +292,7 @@ export default function NutritionScreen() {
           {renderProgressBar('Protein', totals.protein, target.protein, 'blue', Activity)}
           {renderProgressBar('Carbs', totals.carbs, target.carbs, 'amber', Wheat)}
           {renderProgressBar('Fat', totals.fat, target.fat, 'rose', Droplet)}
+          {renderProgressBar('Fiber', totals.fiber, target.fiber || 30, 'emerald', Apple)}
         </div>
       </div>
 
@@ -312,7 +373,8 @@ export default function NutritionScreen() {
                     calories: itemToEdit.calories * factor,
                     protein: itemToEdit.protein * factor,
                     carbs: itemToEdit.carbs * factor,
-                    fat: itemToEdit.fat * factor
+                    fat: itemToEdit.fat * factor,
+                    fiber: (itemToEdit.fiber || 0) * factor
                   };
                   handleUpdateMealEntry(updatedEntry);
                   setItemToEdit(null);

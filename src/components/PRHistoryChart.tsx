@@ -30,6 +30,7 @@ export default function PRHistoryChart({ workouts, exercises }: PRHistoryChartPr
 
     const exerciseData = exercises.find(e => e.id === selectedExerciseId);
     const isBodyweight = exerciseData?.type === 'bodyweight';
+    const isTimed = exerciseData?.type === 'timed';
 
     const history: { date: Date, value: number, label: string }[] = [];
 
@@ -57,7 +58,7 @@ export default function PRHistoryChart({ workouts, exercises }: PRHistoryChartPr
           history.push({
             date: new Date(w.date),
             value: maxVal,
-            label: isBodyweight ? `${maxVal} reps` : `${maxVal}kg`
+            label: isTimed ? `${maxVal} sec` : isBodyweight ? `${maxVal} reps` : `${maxVal}kg`
           });
         }
       }
