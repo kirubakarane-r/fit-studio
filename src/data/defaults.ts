@@ -21,7 +21,7 @@ export const DEFAULT_EXERCISES: Exercise[] = [
   { id: 'e18', name: 'Tricep Pushdown', muscle: 'arms', type: 'weight' },
   { id: 'e19', name: 'Hammer Curl', muscle: 'arms', type: 'weight' },
   { id: 'e20', name: 'Dip', muscle: 'arms', type: 'bodyweight' },
-  { id: 'e21', name: 'Plank', muscle: 'core', type: 'bodyweight' },
+  { id: 'e21', name: 'Plank', muscle: 'core', type: 'timed' },
   { id: 'e22', name: 'Crunch', muscle: 'core', type: 'bodyweight' },
   { id: 'e23', name: 'Running', muscle: 'cardio', type: 'cardio' },
   { id: 'e24', name: 'Cycling', muscle: 'cardio', type: 'cardio' },

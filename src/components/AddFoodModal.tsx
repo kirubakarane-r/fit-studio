@@ -19,7 +19,9 @@ export default function AddFoodModal() {
 
   if (!showAddFoodModal || !activeMealType) return null;
 
-  const filteredFoods = foods.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredFoods = foods
+    .filter(f => f.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const handleAdd = async () => {
     if (selectedFoodIds.size === 0) return;
@@ -35,6 +37,7 @@ export default function AddFoodModal() {
         protein: food.protein * s,
         carbs: food.carbs * s,
         fat: food.fat * s,
+        fiber: (food.fiber || 0) * s,
         servings: s,
         mealType: activeMealType,
         date: selectedDate
@@ -130,7 +133,7 @@ export default function AddFoodModal() {
                       <div className="text-right">
                         <span className="block text-sm font-bold text-emerald-400">{Math.round(food.calories)} kcal</span>
                         <span className="text-[10px] text-neutral-500 mt-0.5 inline-block font-mono">
-                          P:{Math.round(food.protein)} C:{Math.round(food.carbs)} F:{Math.round(food.fat)}
+                          P:{Math.round(food.protein)} C:{Math.round(food.carbs)} F:{Math.round(food.fat)} Fib:{Math.round(food.fiber || 0)}
                         </span>
                       </div>
                     </button>

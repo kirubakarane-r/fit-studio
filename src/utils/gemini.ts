@@ -44,7 +44,8 @@ export async function fetchFoodMacros(
       "calories": number,
       "protein": number,
       "carbs": number,
-      "fat": number
+      "fat": number,
+      "fiber": number
     }
   `;
 

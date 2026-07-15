@@ -192,6 +192,8 @@ export default function ProgressScreen() {
                         prValue = `${pr.weight}kg × ${pr.reps}`;
                       } else if (pr.type === 'bodyweight') {
                         prValue = `${pr.reps} reps`;
+                      } else if (pr.type === 'timed') {
+                        prValue = `${pr.weight} sec`;
                       } else if (pr.type === 'cardio') {
                         prValue = `${pr.weight}m ${pr.reps > 0 ? `${pr.reps}km` : ''}`;
                       }

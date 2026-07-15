@@ -39,7 +39,8 @@ const DEFAULT_TARGET: DailyNutritionTarget = {
   calories: 2000,
   protein: 150,
   carbs: 200,
-  fat: 65
+  fat: 65,
+  fiber: 30
 };
 
 export const NutritionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
